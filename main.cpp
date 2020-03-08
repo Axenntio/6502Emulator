@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	if (argc == 2)
 		file = std::string(argv[1]);
 	EEPROM eeprom(0x8000, file);
-	RAM ram(0x0000, 0x100);
+	RAM ram(0x0000, 0x4000);
 	ACIA acia(0x7f00);
 	CPU cpu(false);
 	cpu.addDevice(&acia);

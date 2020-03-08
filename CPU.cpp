@@ -128,6 +128,12 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "LDA\t$" << int(byte) << std::endl;
 		break;
+	case 0xa8:
+		this->_registers.y = this->_registers.a;
+		this->updateFlag(this->_registers.y);
+		if (this->_debug)
+			std::cout << "TAY" << std::endl;
+		break;
 	case 0xa9:
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.a = byte;
@@ -144,13 +150,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			std::cout << "LDA\t$" << int(byte) << std::endl;
 		break;
 	case 0xb1:
-		//clairement pas sur de ça !
-		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
-		byte = this->readFromDevice(address + this->_registers.y);
+		byte = this->readFromDevice(this->_registers.pc++);
+		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
+		if (this->_debug)
+			std::cout << "LDA\t$" << int(byte) << ", Y"  << std::endl;
+		byte = this->readFromDevice(address);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
-		if (this->_debug)
-			std::cout << "LDA\t#$" << int(address) << ", Y"  << std::endl;
 		break;
 	case 0xbd:
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
@@ -165,6 +171,23 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->updateFlag(this->_registers.y);
 		if (this->_debug)
 			std::cout << "INY" << std::endl;
+		break;
+	case 0xc9:
+		byte = this->readFromDevice(this->_registers.pc++);
+		if (this->_registers.a < byte)
+			this->_registers.p |= CARRY;
+		else
+			this->_registers.p &= ~CARRY;
+		this->updateFlag(this->_registers.a - byte);
+		if (this->_debug)
+			std::cout << "CMP #$" << byte << std::endl;
+		break;
+	case 0xd0:
+		byte = this->readFromDevice(this->_registers.pc++);
+		if (!(this->_registers.p & ZERO))
+			this->_registers.pc += char(byte);
+		if (this->_debug)
+			std::cout << "BNE\t$" << int(byte) << std::endl;
 		break;
 	case 0xd8:
 		this->_registers.p &= ~DECIMAL;
@@ -207,7 +230,6 @@ uint8_t CPU::readFromDevice(uint16_t address) {
 		std::cout << "WARNING: no device at this address, except garbage data" << std::endl;
 		return rand() % 256;
 	}
-	//std::cout << device->getName() << "R\t";
 	return device->readByte(address);
 }
 
@@ -217,7 +239,6 @@ void CPU::writeToDevice(uint16_t address, uint8_t byte) {
 		std::cout << "WARNING: no device at this address, write to nothing" << std::endl;
 		return;
 	}
-	//std::cout << device->getName() << "W\t";
 	device->writeByte(address, byte);
 }
 
