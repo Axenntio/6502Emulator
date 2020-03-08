@@ -32,7 +32,7 @@ uint8_t Device::readByte(uint16_t index) {
 
 void Device::writeByte(uint16_t index, uint8_t value) {
 	if (this->_bus_position > index || this->_bus_position - index > uint16_t(this->_memory.size())) {
-		std::cout << "ERROR: Seem you are out of ram" << std::endl;
+		std::cout << "ERROR: Seem you are out of device" << std::endl;
 		return;
 	}
 	this->_memory[index - this->_bus_position] = value;
@@ -40,10 +40,20 @@ void Device::writeByte(uint16_t index, uint8_t value) {
 
 std::ostream& operator<<(std::ostream& os, Device& device) {
 	std::cout << device.getName() << std::endl;
-	std::cout << "0x" << std::setfill('0') << std::setw(4) << std::hex << device.getOffset() << " - 0x" << device.getOffset() + device.getSize();
+	std::cout << "0x" << std::setfill('0') << std::setw(4) << std::hex << device.getOffset() << " - 0x" << device.getOffset() + device.getSize() - 1;
 	for (uint16_t i = 0; i < device.getSize(); i++) {
-		if (!(i % 16))
+		if (!(i % 16)) {
+			if (i) {
+				os << "\t";
+				for (uint16_t j = i - 16; j < i; j++) {
+					if (std::isprint(device.readByte(j + device.getOffset())))
+						os << device.readByte(j + device.getOffset());
+					else
+						os << ".";
+				}
+			}
 			os << std::endl << std::setfill('0') << std::setw(4) << std::hex << i << ":";
+		}
 		if (!(i % 2))
 			os << " ";
 		os << std::setfill('0') << std::setw(2) << std::hex << int(device.readByte(i + device.getOffset()));

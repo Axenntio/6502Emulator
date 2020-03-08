@@ -24,6 +24,7 @@ uint8_t ACIA::readByte(uint16_t index) {
 			}
 			if (!this->_message.size())
 				this->_memory[1] &= ~0x08;
+			//std::cout << "Get data " << this->_memory[index - this->_bus_position] << " ho and there is data " << int(this->_memory[1]) << std::endl;
 			break;
 		default:
 			break;
@@ -33,7 +34,7 @@ uint8_t ACIA::readByte(uint16_t index) {
 
 void ACIA::writeByte(uint16_t index, uint8_t value) {
 	if (this->_bus_position > index || this->_bus_position - index > uint16_t(this->_memory.size())) {
-		std::cout << "ERROR: Seem you are out of ram" << std::endl;
+		std::cout << "ERROR: Seem you are out of device" << std::endl;
 		return;
 	}
 	this->_memory[index - this->_bus_position] = value;

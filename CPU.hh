@@ -14,12 +14,12 @@
 #define CARRY		1 
 
 typedef struct {
-	uint8_t a; // Accumulator
-	uint8_t x; // X index
-	uint8_t y; // Y index
-	uint8_t sp; // Stack pointer
-	uint8_t p; // Processor flag
-	uint16_t pc; // Program Counter
+	uint8_t a;
+	uint8_t x;
+	uint8_t y;
+	uint8_t sp;
+	uint8_t p;
+	uint16_t pc;
 } registers_t;
 
 class CPU {

@@ -177,7 +177,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 	case 0xc4:
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_debug)
-			std::cout << "CPY $" << byte << std::endl;
+			std::cout << "CPY\t$" << int(byte) << std::endl;
 		byte = this->readFromDevice(byte);
 		if (this->_registers.a < byte)
 			this->_registers.p |= CARRY;
@@ -199,7 +199,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			this->_registers.p &= ~CARRY;
 		this->updateFlag(this->_registers.a - byte);
 		if (this->_debug)
-			std::cout << "CMP #$" << int(byte) << std::endl;
+			std::cout << "CMP\t#$" << int(byte) << std::endl;
 		break;
 	case 0xd0:
 		byte = this->readFromDevice(this->_registers.pc++);
