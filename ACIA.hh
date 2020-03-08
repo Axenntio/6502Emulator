@@ -10,8 +10,13 @@ public:
 	ACIA(uint16_t bus_position);
 	~ACIA();
 
-	uint8_t getByte(uint16_t index) const;
+	uint8_t readByte(uint16_t index);
 	void writeByte(uint16_t index, uint8_t value);
+
+	void sendChars(std::string message);
+
+private:
+	std::string _message;
 };
 
 #endif

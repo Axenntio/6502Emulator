@@ -8,13 +8,23 @@
 #include "ACIA.hh"
 
 bool running = true;
+std::string message;
+bool has_message = false;
 
 void signal_callback_handler(int signum) {
-	running = false;
+	if (signum == SIGINT) {
+		running = false;
+	}
+	else if (signum == SIGTSTP) {
+		std::cin >> message;
+		has_message = true;
+	}
 }
+
 
 int main(int argc, char **argv) {
 	signal(SIGINT, signal_callback_handler);
+	signal(SIGTSTP, signal_callback_handler);
 	std::string file = "firmware";
 	if (argc == 2)
 		file = std::string(argv[1]);
@@ -28,13 +38,15 @@ int main(int argc, char **argv) {
 	cpu.readResetVector();
 	std::cout << cpu << std::endl;
 	while (!cpu.isHalted() && running) {
-		//std::cout << cpu << std::endl;
+		if (has_message) {
+			acia.sendChars(message);
+			has_message = false;
+		}
 		cpu.cycle();
-		//std::cout << ram << std::endl;
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}	
 	std::cout << cpu << std::endl;
 	std::cout << acia << std::endl;
-	std::cout << ram << std::endl;
+	//std::cout << ram << std::endl;
 	return 0;
 }

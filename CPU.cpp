@@ -208,7 +208,7 @@ uint8_t CPU::readFromDevice(uint16_t address) {
 		return rand() % 256;
 	}
 	//std::cout << device->getName() << "R\t";
-	return device->getByte(address);
+	return device->readByte(address);
 }
 
 void CPU::writeToDevice(uint16_t address, uint8_t byte) {

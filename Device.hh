@@ -13,7 +13,7 @@ public:
 	std::string getName() const;
 	uint16_t getOffset() const;
 	uint16_t getSize() const;
-	virtual uint8_t getByte(uint16_t index) const;
+	virtual uint8_t readByte(uint16_t index);
 	virtual void writeByte(uint16_t index, uint8_t value);
 
 protected:
@@ -22,6 +22,6 @@ protected:
 	std::vector<uint8_t> _memory;
 };
 
-std::ostream& operator<<(std::ostream& os, const Device& Device);
+std::ostream& operator<<(std::ostream& os, Device& Device);
 
 #endif
