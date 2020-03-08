@@ -17,6 +17,7 @@ void signal_callback_handler(int signum) {
 	}
 	else if (signum == SIGTSTP) {
 		std::cin >> message;
+		message += "\n";
 		has_message = true;
 	}
 }
@@ -43,7 +44,7 @@ int main(int argc, char **argv) {
 			has_message = false;
 		}
 		cpu.cycle();
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}	
 	std::cout << cpu << std::endl;
 	std::cout << acia << std::endl;

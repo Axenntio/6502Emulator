@@ -95,6 +95,14 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << std::endl;
 		break;
+	case 0x91:
+		byte = this->readFromDevice(this->_registers.pc++);
+		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
+		byte = this->readFromDevice(address);
+		this->writeToDevice(address, byte);
+		if (this->_debug)
+			std::cout << "STA\t$" << int(address) << ", Y" << std::endl;
+		break;
 	case 0x98:
 		this->_registers.a = this->_registers.y;
 		this->updateFlag(this->_registers.a);
@@ -166,6 +174,17 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "LDA\t#$" << int(address) << ", X"  << std::endl;
 		break;
+	case 0xc4:
+		byte = this->readFromDevice(this->_registers.pc++);
+		if (this->_debug)
+			std::cout << "CPY $" << byte << std::endl;
+		byte = this->readFromDevice(byte);
+		if (this->_registers.a < byte)
+			this->_registers.p |= CARRY;
+		else
+			this->_registers.p &= ~CARRY;
+		this->updateFlag(this->_registers.a - byte);
+		break;
 	case 0xc8:
 		this->_registers.y++;
 		this->updateFlag(this->_registers.y);
@@ -180,7 +199,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			this->_registers.p &= ~CARRY;
 		this->updateFlag(this->_registers.a - byte);
 		if (this->_debug)
-			std::cout << "CMP #$" << byte << std::endl;
+			std::cout << "CMP #$" << int(byte) << std::endl;
 		break;
 	case 0xd0:
 		byte = this->readFromDevice(this->_registers.pc++);
