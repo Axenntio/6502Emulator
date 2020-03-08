@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 		file = std::string(argv[1]);
 	EEPROM eeprom(0x8000, file);
 	RAM ram(0x0000, 0x100);
-	ACIA acia(0x07f00);
+	ACIA acia(0x7f00);
 	CPU cpu(false);
 	cpu.addDevice(&acia);
 	cpu.addDevice(&ram);
