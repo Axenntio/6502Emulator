@@ -47,9 +47,9 @@ int main(int argc, char **argv) {
 		cpu.cycle();
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}	
-	std::cout << cpu << std::endl;
-	std::cout << acia << std::endl;
-	//std::cout << ram << std::endl;
-	//std::cout << eeprom << std::endl;
+	// std::cout << cpu << std::endl;
+	// std::cout << acia << std::endl;
+	// std::cout << ram << std::endl;
+	// std::cout << eeprom << std::endl;
 	return 0;
 }
