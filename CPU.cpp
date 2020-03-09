@@ -44,6 +44,23 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		std::cout << std::setfill('0') << std::setw(4) << std::hex << this->_registers.pc << ":\t";
 	this->_registers.pc++;
 	switch (instruction) {
+	case 0x05:
+		byte = this->readFromDevice(this->_registers.pc++);
+		this->_registers.a |= byte;
+		this->updateFlag(this->_registers.a);
+		if (this->_debug)
+			std::cout << "ORA\t$" << int(address) << std::endl;
+		break;
+	case 0x0a:
+		if (this->_registers.a >= 128)
+			this->_registers.p |= CARRY;
+		else
+			this->_registers.p &= ~CARRY;
+		this->_registers.a <<= 1;
+		this->updateFlag(this->_registers.a);
+		if (this->_debug)
+			std::cout << "ASL\tA" << std::endl;
+		break;
 	case 0x20:
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc) << 8);
 		this->writeToDevice(this->_registers.sp--, this->_registers.pc >> 8);
@@ -63,6 +80,16 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->writeToDevice(this->_registers.sp--, this->_registers.a);
 		if (this->_debug)
 			std::cout << "PHA" << std::endl;
+		break;
+	case 0x4a:
+		if (this->_registers.a & 0x01)
+			this->_registers.p |= CARRY;
+		else
+			this->_registers.p &= ~CARRY;
+		this->_registers.a >>= 1;
+		this->updateFlag(this->_registers.a);
+		if (this->_debug)
+			std::cout << "LSR\tA" << std::endl;
 		break;
 	case 0x4c:
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc) << 8);
@@ -95,13 +122,19 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << std::endl;
 		break;
+	case 0x90:
+		byte = this->readFromDevice(this->_registers.pc++);
+		if (!(this->_registers.p & CARRY))
+			this->_registers.pc += char(byte);
+		if (this->_debug)
+			std::cout << "BCC\t$" << int(byte) << std::endl;
+		break;
 	case 0x91:
 		byte = this->readFromDevice(this->_registers.pc++);
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
-		byte = this->readFromDevice(address);
-		this->writeToDevice(address, byte);
+		this->writeToDevice(address, this->_registers.a);
 		if (this->_debug)
-			std::cout << "STA\t$" << int(address) << ", Y" << std::endl;
+			std::cout << "STA\t$" << int(address) << ", Y" << std::endl << std::endl;
 		break;
 	case 0x98:
 		this->_registers.a = this->_registers.y;
