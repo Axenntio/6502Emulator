@@ -157,7 +157,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
 		this->writeToDevice(address, this->_registers.a);
 		if (this->_debug)
-			std::cout << "STA\t($" << int(address) << "), Y" << std::endl << std::endl;
+			std::cout << "STA\t($" << int(address) << "), Y"  << std::endl;
 		break;
 	case 0x98: // TYA implied
 		this->_registers.a = this->_registers.y;
