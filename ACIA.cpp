@@ -24,7 +24,6 @@ uint8_t ACIA::readByte(uint16_t index) {
 			}
 			if (!this->_message.size())
 				this->_memory[1] &= ~0x08;
-			//std::cout << "Get data " << this->_memory[index - this->_bus_position] << " ho and there is data " << int(this->_memory[1]) << std::endl;
 			break;
 		default:
 			break;
