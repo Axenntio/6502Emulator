@@ -16,10 +16,12 @@ void signal_callback_handler(int signum) {
 		running = false;
 	}
 	else if (signum == SIGTSTP) {
-		//std::cin >> message;
-		message = "m 8000";
-		message += "\n";
-		has_message = true;
+		if (!has_message) {
+			has_message = true;
+			std::cin >> message;
+			//message = "m 8000";
+			//message += "\n";
+		}
 	}
 }
 
@@ -32,7 +34,7 @@ int main(int argc, char **argv) {
 		file = std::string(argv[1]);
 	EEPROM eeprom(0x8000, file);
 	RAM ram(0x0000, 0x4000);
-	ACIA acia(0x7f00);
+	ACIA acia(0x6000);
 	CPU cpu(false);
 	cpu.addDevice(&ram);
 	cpu.addDevice(&acia);
@@ -45,7 +47,7 @@ int main(int argc, char **argv) {
 			has_message = false;
 		}
 		cpu.cycle();
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}	
 	// std::cout << cpu << std::endl;
 	// std::cout << acia << std::endl;
