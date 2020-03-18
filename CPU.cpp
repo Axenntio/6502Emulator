@@ -170,6 +170,12 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "TXS" << std::endl;
 		break;
+	case 0x9d: // STA absolute, X
+		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
+		this->writeToDevice(address + this->_registers.x, this->_registers.a);
+		if (this->_debug)
+			std::cout << "STA\t$" << int(address) << ", X"  << std::endl;
+		break;
 	case 0xa0: // LDY immidiate
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.y = byte;
