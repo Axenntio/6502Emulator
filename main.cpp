@@ -18,9 +18,9 @@ void signal_callback_handler(int signum) {
 	else if (signum == SIGTSTP) {
 		if (!has_message) {
 			has_message = true;
-			std::cin >> message;
+			std::getline(std::cin, message);
 			//message = "m 8000";
-			//message += "\n";
+			message += "\n";
 		}
 	}
 }
