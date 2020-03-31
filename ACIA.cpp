@@ -50,3 +50,8 @@ void ACIA::sendChars(std::string message) {
 	this->_message = message;
 	this->_memory[1] |= 0x08;
 }
+
+void ACIA::sendChar(char c) {
+	this->_message += c;
+	this->_memory[1] |= 0x08;
+}

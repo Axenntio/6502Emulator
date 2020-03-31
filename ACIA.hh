@@ -13,6 +13,7 @@ public:
 	uint8_t readByte(uint16_t index);
 	void writeByte(uint16_t index, uint8_t value);
 
+	void sendChar(char c);
 	void sendChars(std::string message);
 
 private:
