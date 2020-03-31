@@ -138,6 +138,12 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << std::endl;
 		break;
+	case 0x88: // DEY implied
+		this->_registers.y--;
+		this->updateFlag(this->_registers.y);
+		if (this->_debug)
+			std::cout << "DEY" << std::endl;
+		break;
 	case 0x8d: // STA absolute
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
 		this->writeToDevice(address, this->_registers.a);
