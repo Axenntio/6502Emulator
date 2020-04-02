@@ -43,6 +43,9 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		std::cout << std::setfill('0') << std::setw(4) << std::hex << this->_registers.pc << ":\t";
 	this->_registers.pc++;
 	switch (instruction) {
+	case 0x00: // BRK, need reimplementation (use to debug)
+		this->_halted = true;
+		break;
 	case 0x05: // ORA zeropage (3)
 		address = this->readFromDevice(this->_registers.pc++);
 		byte = this->readFromDevice(address);
@@ -198,7 +201,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		break;
 	case 0xa5: // LDA zeropage
 		address = this->readFromDevice(this->_registers.pc++);
-		byte = this->readFromDevice(byte);
+		byte = this->readFromDevice(address);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
 		if (this->_debug)
