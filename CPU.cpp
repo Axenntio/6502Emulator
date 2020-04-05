@@ -135,6 +135,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "ADC\t#$" << int(byte) << std::endl;
 		break;
+	case 0x6c: // JMP indirect (5)
+		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc) << 8);
+		address = this->readFromDevice(address) + (this->readFromDevice(address + 1) << 8);
+		this->_registers.pc = address;
+		if (this->_debug)
+			std::cout << "JMP\t($" << int(address) << ")" << std::endl;
+		break;
 	case 0x85: // STA zeropage
 		address = this->readFromDevice(this->_registers.pc++);
 		this->writeToDevice(address, this->_registers.a);
