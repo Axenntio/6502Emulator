@@ -39,10 +39,7 @@ void ACIA::writeByte(uint16_t index, uint8_t value) {
 	this->_memory[index - this->_bus_position] = value;
 	switch (index - this->_bus_position) {
 		case 0:
-			if (value == 0x7f)
-				std::cout << "\b" << std::flush;
-			else
-				std::cout << value << std::flush;
+			std::cout << value << std::flush;
 			break;
 		default:
 			break;
