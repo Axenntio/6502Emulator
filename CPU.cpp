@@ -55,7 +55,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			std::cout << "ORA\t$" << int(address) << std::endl;
 		break;
 	case 0x0a: // ASL accumulator (2)
-		byte = (this->_registers.a << 1) + (this->_registers.p & CARRY);
+		byte = (this->_registers.a << 1);
 		if (this->_registers.a & 0x80)
 			this->_registers.p |= CARRY;
 		else
@@ -124,7 +124,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "PLA" << std::endl;
 		break;
-	case 0x69: // ADC immidiate
+	case 0x69: // ADC immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) > 255)
 			this->_registers.p |= OVERFLOW;
@@ -161,7 +161,6 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			std::cout << "BCC\t$" << int(byte) << std::endl;
 		break;
 	case 0x91: // STA (indirect), Y
-		// Should probably go back, but not sure
 		byte = this->readFromDevice(this->_registers.pc++);
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
 		this->writeToDevice(address, this->_registers.a);
@@ -185,14 +184,14 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << ", X"  << std::endl;
 		break;
-	case 0xa0: // LDY immidiate
+	case 0xa0: // LDY immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.y = byte;
 		this->updateFlag(this->_registers.y);
 		if (this->_debug)
 			std::cout << "LDY\t#$" << int(byte) << std::endl;
 		break;
-	case 0xa2: // LDX immidiate
+	case 0xa2: // LDX immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.x = byte;
 		this->updateFlag(this->_registers.x);
@@ -213,7 +212,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "TAY" << std::endl;
 		break;
-	case 0xa9: // LDA immidiate
+	case 0xa9: // LDA immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
@@ -236,7 +235,6 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			std::cout << "BCS\t$" << int(byte) << std::endl;
 		break;
 	case 0xb1: // LDA (indirect), Y
-		// Should probably go back, but not sure
 		byte = this->readFromDevice(this->_registers.pc++);
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
 		if (this->_debug)
@@ -253,7 +251,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "LDA\t$" << int(address) << ", X"  << std::endl;
 		break;
-	case 0xc0: // CPY immidiate
+	case 0xc0: // CPY immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.y >= byte)
 			this->_registers.p |= CARRY;
@@ -280,7 +278,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "INY" << std::endl;
 		break;
-	case 0xc9: // CMP immidiate
+	case 0xc9: // CMP immediate
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.a >= byte)
 			this->_registers.p |= CARRY;
@@ -308,13 +306,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "INX" << std::endl;
 		break;
-	case 0xe9: // SBC immidiate
+	case 0xe9: // SBC immediate
 		byte = this->readFromDevice(this->_registers.pc++);
-		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) > 255)
+		if (int(this->_registers.a) - (byte + (this->_registers.p & CARRY)) < 0)
 			this->_registers.p |= OVERFLOW;
 		else
 			this->_registers.p |= OVERFLOW;
-		this->_registers.a -= (byte + (this->_registers.p & CARRY));
+		this->_registers.a -= (byte + (1 - (this->_registers.p & CARRY)));
 		this->updateFlag(this->_registers.a);
 		if (this->_debug)
 			std::cout << "SBC\t#$" << int(byte) << std::endl;
