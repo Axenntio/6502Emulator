@@ -39,6 +39,7 @@ public:
 
 
 	bool isHalted() const;
+
 private:
 	Device* getDevice(uint16_t address);
 	void parseInstructiom(uint8_t instruction);
@@ -46,6 +47,7 @@ private:
 	registers_t _registers;
 	bool _halted;
 	bool _debug;
+	uint8_t _wait;
 
 	std::vector<Device*> _devices;
 };

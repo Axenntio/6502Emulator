@@ -88,17 +88,18 @@ int main(int argc, char **argv) {
 	while (!cpu.isHalted() && running) {
 		if (kbhit()) {
 			acia.sendChar(getch());
+			//std::cout << "There is in hex: " << std::hex << int(getch()) << std::endl;
 		}
 		if (has_message) {
 			acia.sendChars(message);
 			has_message = false;
 		}
 		cpu.cycle();
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}	
 	// std::cout << cpu << std::endl;
-	// std::cout << acia << std::endl;
 	// std::cout << ram << std::endl;
+	// std::cout << acia << std::endl;
 	// std::cout << eeprom << std::endl;
 	disable_raw_mode();
 	return 0;

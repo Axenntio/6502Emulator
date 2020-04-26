@@ -2,7 +2,7 @@
 #include <iomanip>
 #include "CPU.hh"
 
-CPU::CPU(bool debug) : _halted(false), _debug(debug) {
+CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_registers.a = 0;
 	this->_registers.x = 0;
 	this->_registers.y = 0;
@@ -32,7 +32,10 @@ void CPU::readResetVector() {
 }
 
 void CPU::cycle() {
-	this->parseInstructiom(this->readFromDevice(this->_registers.pc));
+	if (!this->_wait)
+		this->parseInstructiom(this->readFromDevice(this->_registers.pc));
+	else
+		this->_wait--;
 }
 
 void CPU::parseInstructiom(uint8_t instruction) {
@@ -51,6 +54,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		byte = this->readFromDevice(address);
 		this->_registers.a |= byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "ORA\t$" << int(address) << std::endl;
 		break;
@@ -62,11 +66,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			this->_registers.p &= ~CARRY;
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "ASL\tA" << std::endl;
 		break;
 	case 0x18: // CLC implied (2)
 		this->_registers.p &= ~CARRY;
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "CLC" << std::endl;
 		break;
@@ -75,6 +81,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->writeToDevice(0xff + this->_registers.sp--, this->_registers.pc >> 8);
 		this->writeToDevice(0xff + this->_registers.sp--, this->_registers.pc & 0xff);
 		this->_registers.pc = address;
+		this->_wait = 6;
 		if (this->_debug)
 			std::cout << "JSR\t$" << int(address) << std::endl;
 		break;
@@ -82,16 +89,19 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.a &= byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "AND\t#$" << int(byte) << std::endl;
 		break;
 	case 0x38: // SEC implied (2)
 		this->_registers.p |= CARRY;
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "SEC" << std::endl;
 		break;
 	case 0x48: // PHA implied (3)
 		this->writeToDevice(0xff + this->_registers.sp--, this->_registers.a);
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "PHA" << std::endl;
 		break;
@@ -102,12 +112,14 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			this->_registers.p &= ~CARRY;
 		this->_registers.a >>= 1;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "LRS\tA" << std::endl;
 		break;
 	case 0x4c: // JMP absolute (3)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc) << 8);
 		this->_registers.pc = address;
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "JMP\t$" << int(address) << std::endl;
 		break;
@@ -115,16 +127,18 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->_registers.pc = this->readFromDevice(0xff + ++this->_registers.sp);
 		this->_registers.pc += this->readFromDevice(0xff + ++this->_registers.sp) << 8;
 		this->_registers.pc++;
+		this->_wait = 6;
 		if (this->_debug)
 			std::cout << "RTS" << std::endl;
 		break;
 	case 0x68: // PLA implied  (4)
 		this->_registers.a = this->readFromDevice(0xff + ++this->_registers.sp);
 		this->updateFlag(this->_registers.a);
+		this->_wait = 4;
 		if (this->_debug)
 			std::cout << "PLA" << std::endl;
 		break;
-	case 0x69: // ADC immediate
+	case 0x69: // ADC immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) > 255)
 			this->_registers.p |= OVERFLOW;
@@ -132,6 +146,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 			this->_registers.p |= OVERFLOW;
 		this->_registers.a += byte + (this->_registers.p & CARRY);
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "ADC\t#$" << int(byte) << std::endl;
 		break;
@@ -139,109 +154,125 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc) << 8);
 		address = this->readFromDevice(address) + (this->readFromDevice(address + 1) << 8);
 		this->_registers.pc = address;
+		this->_wait = 5;
 		if (this->_debug)
 			std::cout << "JMP\t($" << int(address) << ")" << std::endl;
 		break;
-	case 0x85: // STA zeropage
+	case 0x85: // STA zeropage (3)
 		address = this->readFromDevice(this->_registers.pc++);
 		this->writeToDevice(address, this->_registers.a);
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << std::endl;
 		break;
-	case 0x88: // DEY implied
+	case 0x88: // DEY implied (2)
 		this->_registers.y--;
 		this->updateFlag(this->_registers.y);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "DEY" << std::endl;
 		break;
-	case 0x8d: // STA absolute
+	case 0x8d: // STA absolute (4)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
 		this->writeToDevice(address, this->_registers.a);
+		this->_wait = 4;
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << std::endl;
 		break;
-	case 0x90: // BCC relative
+	case 0x90: // BCC relative (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (!(this->_registers.p & CARRY))
 			this->_registers.pc += char(byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "BCC\t$" << int(byte) << std::endl;
 		break;
-	case 0x91: // STA (indirect), Y
+	case 0x91: // STA (indirect), Y (6)
 		byte = this->readFromDevice(this->_registers.pc++);
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
 		this->writeToDevice(address, this->_registers.a);
+		this->_wait = 6;
 		if (this->_debug)
 			std::cout << "STA\t($" << int(address) << "), Y"  << std::endl;
 		break;
-	case 0x98: // TYA implied
+	case 0x98: // TYA implied (2)
 		this->_registers.a = this->_registers.y;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "TYA" << std::endl;
 		break;
-	case 0x9a: // TXS implied
+	case 0x9a: // TXS implied (2)
 		this->_registers.sp = this->_registers.x;
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "TXS" << std::endl;
 		break;
-	case 0x9d: // STA absolute, X
+	case 0x9d: // STA absolute, X (5)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
 		this->writeToDevice(address + this->_registers.x, this->_registers.a);
+		this->_wait = 5;
 		if (this->_debug)
 			std::cout << "STA\t$" << int(address) << ", X"  << std::endl;
 		break;
-	case 0xa0: // LDY immediate
+	case 0xa0: // LDY immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.y = byte;
 		this->updateFlag(this->_registers.y);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "LDY\t#$" << int(byte) << std::endl;
 		break;
-	case 0xa2: // LDX immediate
+	case 0xa2: // LDX immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.x = byte;
 		this->updateFlag(this->_registers.x);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "LDX\t#$" << int(byte) << std::endl;
 		break;
-	case 0xa5: // LDA zeropage
+	case 0xa5: // LDA zeropage (3)
 		address = this->readFromDevice(this->_registers.pc++);
 		byte = this->readFromDevice(address);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "LDA\t$" << int(address) << std::endl;
 		break;
-	case 0xa8: // TAY implied
+	case 0xa8: // TAY implied (2)
 		this->_registers.y = this->_registers.a;
 		this->updateFlag(this->_registers.y);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "TAY" << std::endl;
 		break;
-	case 0xa9: // LDA immediate
+	case 0xa9: // LDA immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "LDA\t#$" << int(byte) << std::endl;
 		break;
-	case 0xad: // LDA absolute
+	case 0xad: // LDA absolute (4)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
 		byte = this->readFromDevice(address);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 4;
 		if (this->_debug)
 			std::cout << "LDA\t$" << int(byte) << std::endl;
 		break;
-	case 0xb0: // BCS relative
+	case 0xb0: // BCS relative (2**)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.p & CARRY)
 			this->_registers.pc += char(byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "BCS\t$" << int(byte) << std::endl;
 		break;
-	case 0xb1: // LDA (indirect), Y
+	case 0xb1: // LDA (indirect), Y (5*)
 		byte = this->readFromDevice(this->_registers.pc++);
 		address = this->readFromDevice(byte) + (this->readFromDevice(byte + 1) << 8) + this->_registers.y;
 		if (this->_debug)
@@ -249,26 +280,29 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		byte = this->readFromDevice(address);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 5;
 		break;
-	case 0xbd: // LDA absolute, X
+	case 0xbd: // LDA absolute, X (4*)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
 		byte = this->readFromDevice(address + this->_registers.x);
 		this->_registers.a = byte;
 		this->updateFlag(this->_registers.a);
+		this->_wait = 4;
 		if (this->_debug)
 			std::cout << "LDA\t$" << int(address) << ", X"  << std::endl;
 		break;
-	case 0xc0: // CPY immediate
+	case 0xc0: // CPY immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.y >= byte)
 			this->_registers.p |= CARRY;
 		else
 			this->_registers.p &= ~CARRY;
 		this->updateFlag(this->_registers.y - byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "CPY\t#$" << int(byte) << std::endl;
 		break;
-	case 0xc4: // CPY zeropage
+	case 0xc4: // CPY zeropage (3)
 		address = this->readFromDevice(this->_registers.pc++);
 		byte = this->readFromDevice(address);
 		if (this->_registers.y >= byte)
@@ -276,40 +310,46 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		else
 			this->_registers.p &= ~CARRY;
 		this->updateFlag(this->_registers.y - byte);
+		this->_wait = 3;
 		if (this->_debug)
 			std::cout << "CPY\t$" << int(address) << std::endl;
 		break;
-	case 0xc8: // INY implied
+	case 0xc8: // INY implied (2)
 		this->_registers.y++;
 		this->updateFlag(this->_registers.y);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "INY" << std::endl;
 		break;
-	case 0xc9: // CMP immediate
+	case 0xc9: // CMP immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.a >= byte)
 			this->_registers.p |= CARRY;
 		else
 			this->_registers.p &= ~CARRY;
 		this->updateFlag(this->_registers.a - byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "CMP\t#$" << int(byte) << std::endl;
 		break;
-	case 0xd0: // BNE relative
+	case 0xd0: // BNE relative (2**)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (!(this->_registers.p & ZERO))
 			this->_registers.pc += char(byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "BNE\t$" << int(byte) << std::endl;
 		break;
-	case 0xd8: // CLD implied
+	case 0xd8: // CLD implied (2)
 		this->_registers.p &= ~DECIMAL;
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "CLD" << std::endl;
 		break;
-	case 0xe8: // INX implied
+	case 0xe8: // INX implied (2)
 		this->_registers.x++;
 		this->updateFlag(this->_registers.x);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "INX" << std::endl;
 		break;
@@ -324,16 +364,19 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "SBC\t#$" << int(byte) << std::endl;
 		break;
-	case 0xf0: // BEQ relative
+	case 0xf0: // BEQ relative (2**)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (this->_registers.p & ZERO)
 			this->_registers.pc += char(byte);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "BEQ\t$" << int(byte) << std::endl;
 		break;
 	default:
 		std::cout << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << int(instruction) << std::endl;
+		this->_wait = 1;
 	}
+	this->_wait--;
 }
 
 void CPU::updateFlag(uint8_t value) {
