@@ -131,6 +131,22 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "RTS" << std::endl;
 		break;
+	case 0x65: // ADC zeropage (3)
+		address = this->readFromDevice(this->_registers.pc++);
+		byte = this->readFromDevice(address);
+		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) < 0) {
+			this->_registers.p |= CARRY;
+			this->_registers.p |= OVERFLOW;
+		}
+		else
+			this->_registers.p &= ~OVERFLOW;
+		this->_registers.a += byte + (this->_registers.p & CARRY);
+		this->_registers.p &= ~CARRY;
+		this->updateFlag(this->_registers.a);
+		this->_wait = 3;
+		if (this->_debug)
+			std::cout << "ADC\t$" << int(byte) << std::endl;
+		break;
 	case 0x68: // PLA implied  (4)
 		this->_registers.a = this->readFromDevice(0xff + ++this->_registers.sp);
 		this->updateFlag(this->_registers.a);
@@ -140,10 +156,12 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		break;
 	case 0x69: // ADC immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
-		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) > 255)
+		if (int(this->_registers.a) + byte + (this->_registers.p & CARRY) > 255) {
+			this->_registers.p |= CARRY;
 			this->_registers.p |= OVERFLOW;
+		}
 		else
-			this->_registers.p |= OVERFLOW;
+			this->_registers.p &= ~OVERFLOW;
 		this->_registers.a += byte + (this->_registers.p & CARRY);
 		this->updateFlag(this->_registers.a);
 		this->_wait = 2;
@@ -171,6 +189,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "DEY" << std::endl;
+		break;
+	case 0x8a: // TXA implied (2)
+		this->_registers.a = this->_registers.x;
+		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
+		if (this->_debug)
+			std::cout << "TXA" << std::endl;
 		break;
 	case 0x8d: // STA absolute (4)
 		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
@@ -201,6 +226,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "TYA" << std::endl;
+		break;
+	case 0x99: // STA absolute, Y (5)
+		address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
+		this->writeToDevice(address + this->_registers.y, this->_registers.a);
+		this->_wait = 5;
+		if (this->_debug)
+			std::cout << "STA\t$" << int(address) << ", Y"  << std::endl;
 		break;
 	case 0x9a: // TXS implied (2)
 		this->_registers.sp = this->_registers.x;
@@ -332,6 +364,13 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "CMP\t#$" << int(byte) << std::endl;
 		break;
+	case 0xca: // DEX implied (2)
+		this->_registers.x--;
+		this->updateFlag(this->_registers.x);
+		this->_wait = 2;
+		if (this->_debug)
+			std::cout << "DEX" << std::endl;
+		break;
 	case 0xd0: // BNE relative (2**)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (!(this->_registers.p & ZERO))
@@ -346,6 +385,23 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "CLD" << std::endl;
 		break;
+	case 0xe5: // SBC zeropage (3)
+		address = this->readFromDevice(this->_registers.pc++);
+		byte = this->readFromDevice(address);
+		if (int(this->_registers.a) - (byte + (this->_registers.p & CARRY)) < 0)
+			this->_registers.p |= OVERFLOW;
+		else
+			this->_registers.p &= ~OVERFLOW;
+		this->_registers.a -= (byte + (1 - (this->_registers.p & CARRY)));
+		if (this->_registers.a & 0x80)
+			this->_registers.p |= CARRY;
+		else
+			this->_registers.p &= ~CARRY;
+		this->updateFlag(this->_registers.a);
+		this->_wait = 3;
+		if (this->_debug)
+			std::cout << "SBC\t$" << int(byte) << std::endl;
+		break;
 	case 0xe8: // INX implied (2)
 		this->_registers.x++;
 		this->updateFlag(this->_registers.x);
@@ -353,16 +409,21 @@ void CPU::parseInstructiom(uint8_t instruction) {
 		if (this->_debug)
 			std::cout << "INX" << std::endl;
 		break;
-	case 0xe9: // SBC immediate
+	case 0xe9: // SBC immediate (2)
 		byte = this->readFromDevice(this->_registers.pc++);
 		if (int(this->_registers.a) - (byte + (this->_registers.p & CARRY)) < 0)
 			this->_registers.p |= OVERFLOW;
 		else
-			this->_registers.p |= OVERFLOW;
+			this->_registers.p &= ~OVERFLOW;
 		this->_registers.a -= (byte + (1 - (this->_registers.p & CARRY)));
 		this->updateFlag(this->_registers.a);
+		this->_wait = 2;
 		if (this->_debug)
 			std::cout << "SBC\t#$" << int(byte) << std::endl;
+		break;
+	case 0xea: // NOP, need reimplementation (use to debug)
+		std::cout << *this << std::endl;
+		this->_wait = 2;
 		break;
 	case 0xf0: // BEQ relative (2**)
 		byte = this->readFromDevice(this->_registers.pc++);
@@ -394,7 +455,7 @@ void CPU::updateFlag(uint8_t value) {
 uint8_t CPU::readFromDevice(uint16_t address) {
 	Device* device = this->getDevice(address);
 	if (device == nullptr) {
-		std::cout << "WARNING: no device at this address, except garbage data" << std::endl;
+		std::cout << "WARNING: no device at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return rand() % 256;
 	}
 	return device->readByte(address);
@@ -403,7 +464,7 @@ uint8_t CPU::readFromDevice(uint16_t address) {
 void CPU::writeToDevice(uint16_t address, uint8_t byte) {
 	Device* device = this->getDevice(address);
 	if (device == nullptr) {
-		std::cout << "WARNING: no device at this address, write to nothing" << std::endl;
+		std::cout << "WARNING: no device at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return;
 	}
 	device->writeByte(address, byte);
