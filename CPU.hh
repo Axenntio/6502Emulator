@@ -60,10 +60,21 @@ private:
 	uint16_t indirectYAddress();
 
 	// Opcodes
+	void ADC(uint16_t address);
 	void AND(uint16_t address);
+	void ASL(uint16_t address);
+	void ASL_ACC(uint16_t address);
+	void BCC(uint16_t address);
+	void BCS(uint16_t address);
 	void BEQ(uint16_t address);
 	void BNE(uint16_t address);
+	void CLC(uint16_t address);
+	void CLD(uint16_t address);
 	void CMP(uint16_t address);
+	void CPX(uint16_t address);
+	void CPY(uint16_t address);
+	void DEX(uint16_t address);
+	void DEY(uint16_t address);
 	void INX(uint16_t address);
 	void INY(uint16_t address);
 	void JMP(uint16_t address);
@@ -71,11 +82,16 @@ private:
 	void LDA(uint16_t address);
 	void LDX(uint16_t address);
 	void LDY(uint16_t address);
+	void LSR(uint16_t address);
+	void LSR_ACC(uint16_t address);
+	void ORA(uint16_t address);
 	void PHA(uint16_t address);
 	void PHP(uint16_t address);
 	void PLA(uint16_t address);
 	void PLP(uint16_t address);
 	void RTS(uint16_t address);
+	void SBC(uint16_t address);
+	void SEC(uint16_t address);
 	void STA(uint16_t address);
 	void TAY(uint16_t address);
 	void TYA(uint16_t address);
@@ -84,6 +100,8 @@ private:
 	void updateFlagCarry(uint16_t value);
 	void updateFlagZero(uint8_t value);
 	void updateFlagNegative(uint8_t value);
+	void setFlagCarry(bool active);
+	void setFlagOverflow(bool active);
 
 	typedef struct {
 		void (CPU::*opcode)(uint16_t address);
