@@ -37,6 +37,9 @@ public:
 	uint8_t readFromDevice(uint16_t address);
 	void writeToDevice(uint16_t address, uint8_t byte);
 
+	void setDebug(bool active);
+	void toggleDebug();
+	bool isDebug() const;
 
 	bool isHalted() const;
 
@@ -68,6 +71,7 @@ private:
 	void BCS(uint16_t address);
 	void BEQ(uint16_t address);
 	void BNE(uint16_t address);
+	void BRK(uint16_t address);
 	void CLC(uint16_t address);
 	void CLD(uint16_t address);
 	void CMP(uint16_t address);
@@ -84,6 +88,7 @@ private:
 	void LDY(uint16_t address);
 	void LSR(uint16_t address);
 	void LSR_ACC(uint16_t address);
+	void NOP(uint16_t address);
 	void ORA(uint16_t address);
 	void PHA(uint16_t address);
 	void PHP(uint16_t address);
@@ -94,6 +99,7 @@ private:
 	void SEC(uint16_t address);
 	void STA(uint16_t address);
 	void TAY(uint16_t address);
+	void TXS(uint16_t address);
 	void TYA(uint16_t address);
 
 	// Flags

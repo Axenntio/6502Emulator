@@ -10,7 +10,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_registers.p = 0;
 	this->_registers.pc = 0;
 
-	this->_op_table[0x00] = {nullptr, &CPU::impliedAddress, 1}; // 0x00
+	this->_op_table[0x00] = {&CPU::BRK, &CPU::impliedAddress, 1}; // 0x00
 	this->_op_table[0x01] = {&CPU::ORA, &CPU::indirectXAddress, 6};
 	this->_op_table[0x02] = {nullptr, nullptr, 1};
 	this->_op_table[0x03] = {nullptr, nullptr, 1};
@@ -164,7 +164,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_op_table[0x97] = {nullptr, nullptr, 1};
 	this->_op_table[0x98] = {&CPU::TYA, &CPU::impliedAddress, 2};
 	this->_op_table[0x99] = {&CPU::STA, &CPU::absoluteYAddress, 5};
-	this->_op_table[0x9a] = {nullptr, &CPU::impliedAddress, 1};
+	this->_op_table[0x9a] = {&CPU::TXS, &CPU::impliedAddress, 2};
 	this->_op_table[0x9b] = {nullptr, nullptr, 1};
 	this->_op_table[0x9c] = {nullptr, nullptr, 1};
 	this->_op_table[0x9d] = {&CPU::STA, &CPU::absoluteXAddress, 5};
@@ -244,7 +244,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_op_table[0xe7] = {nullptr, nullptr, 1};
 	this->_op_table[0xe8] = {&CPU::INX, &CPU::impliedAddress, 2};
 	this->_op_table[0xe9] = {&CPU::SBC, &CPU::immediateAddress, 2};
-	this->_op_table[0xea] = {nullptr, &CPU::impliedAddress, 1};
+	this->_op_table[0xea] = {&CPU::NOP, &CPU::impliedAddress, 1};
 	this->_op_table[0xeb] = {nullptr, nullptr, 1};
 	this->_op_table[0xec] = {&CPU::CPX, &CPU::absoluteAddress, 4};
 	this->_op_table[0xed] = {&CPU::SBC, &CPU::absoluteAddress, 4};
@@ -269,6 +269,18 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 
 CPU::~CPU() {
 
+}
+
+void CPU::setDebug(bool active) {
+	this->_debug = active;
+}
+
+void CPU::toggleDebug() {
+	this->_debug = !this->_debug;
+}
+
+bool CPU::isDebug() const {
+	return this->_debug;
 }
 
 bool CPU::isHalted() const {
@@ -324,7 +336,9 @@ uint16_t CPU::immediateAddress() {
 }
 
 uint16_t CPU::absoluteAddress() {
-	return this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
+	uint16_t address = this->readFromDevice(this->_registers.pc++);
+	address += (this->readFromDevice(this->_registers.pc++) << 8);
+	return address;
 }
 
 uint16_t CPU::absoluteXAddress() {
@@ -353,12 +367,13 @@ uint16_t CPU::relativeAddress() {
 }
 
 uint16_t CPU::indirectAddress() {
-	uint16_t address = this->readFromDevice(this->_registers.pc++) + (this->readFromDevice(this->_registers.pc++) << 8);
+	uint16_t address = this->readFromDevice(this->_registers.pc++);
+	address += (this->readFromDevice(this->_registers.pc++) << 8);
 	return this->readFromDevice(address) + (this->readFromDevice(address + 1) << 8);
 }
 
 uint16_t CPU::indirectXAddress() {
-	uint16_t address = this->readFromDevice(this->_registers.pc++) + this->_registers.x;
+	uint16_t address = (this->readFromDevice(this->_registers.pc++) + this->_registers.x) % 256;
 	return this->readFromDevice(address) + (this->readFromDevice(address + 1) << 8);
 }
 
@@ -391,7 +406,7 @@ void CPU::AND(uint16_t address) {
 
 void CPU::ASL(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	this->updateFlagCarry(0 - (byte & 0x80));
+	this->setFlagCarry(byte & 0x80);
 	byte <<= 1;
 	this->updateFlagZero(byte);
 	this->updateFlagNegative(byte);
@@ -401,7 +416,7 @@ void CPU::ASL(uint16_t address) {
 }
 
 void CPU::ASL_ACC(uint16_t address [[maybe_unused]]) {
-	this->updateFlagCarry(0 - (this->_registers.a & 0x80));
+	this->setFlagCarry(this->_registers.a & 0x80);
 	this->_registers.a <<= 1;
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
@@ -437,6 +452,12 @@ void CPU::BNE(uint16_t address) {
 		std::cout << "BNE\t$" << address << std::endl;
 }
 
+void CPU::BRK(uint16_t address [[maybe_unused]]) {
+	this->_halted = true;
+	if (this->_debug)
+		std::cout << "BRK" << std::endl;
+}
+
 void CPU::CLC(uint16_t address [[maybe_unused]]) {
 	this->_registers.p &= ~CARRY;
 	if (this->_debug)
@@ -451,7 +472,7 @@ void CPU::CLD(uint16_t address [[maybe_unused]]) {
 
 void CPU::CMP(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	this->updateFlagCarry(uint16_t(this->_registers.a) - byte);
+	this->setFlagCarry(this->_registers.a < byte);
 	this->updateFlagZero(this->_registers.a - byte);
 	this->updateFlagNegative(this->_registers.a - byte);
 	if (this->_debug)
@@ -460,7 +481,7 @@ void CPU::CMP(uint16_t address) {
 
 void CPU::CPX(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	this->updateFlagCarry(uint16_t(this->_registers.x) - byte);
+	this->setFlagCarry(this->_registers.x < byte);
 	this->updateFlagZero(this->_registers.x - byte);
 	this->updateFlagNegative(this->_registers.x - byte);
 	if (this->_debug)
@@ -469,7 +490,7 @@ void CPU::CPX(uint16_t address) {
 
 void CPU::CPY(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	this->updateFlagCarry(uint16_t(this->_registers.y) - byte);
+	this->setFlagCarry(this->_registers.y < byte);
 	this->updateFlagZero(this->_registers.y - byte);
 	this->updateFlagNegative(this->_registers.y - byte);
 	if (this->_debug)
@@ -551,7 +572,7 @@ void CPU::LDY(uint16_t address) {
 
 void CPU::LSR(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	this->updateFlagCarry(0 - (byte & 0x01));
+	this->setFlagCarry(byte & 0x01);
 	byte >>= 1;
 	this->updateFlagZero(byte);
 	this->updateFlagNegative(byte);
@@ -561,12 +582,18 @@ void CPU::LSR(uint16_t address) {
 }
 
 void CPU::LSR_ACC(uint16_t address [[maybe_unused]]) {
-	this->updateFlagCarry(0 - (this->_registers.a & 0x01));
+	this->setFlagCarry(this->_registers.a & 0x01);
 	this->_registers.a >>= 1;
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
 	if (this->_debug)
 		std::cout << "LSR\tA" << std::endl;
+}
+
+void CPU::NOP(uint16_t address [[maybe_unused]]) {
+	this->toggleDebug();
+	if (this->_debug)
+		std::cout << "NOP" << std::endl;
 }
 
 void CPU::ORA(uint16_t address) {
@@ -613,7 +640,7 @@ void CPU::RTS(uint16_t address [[maybe_unused]]) {
 
 void CPU::SBC(uint16_t address) {
 	uint8_t byte = this->readFromDevice(address);
-	uint16_t value = uint16_t(this->_registers.a) - byte - (this->_registers.p & CARRY);
+	uint16_t value = uint16_t(this->_registers.a) - byte - (1 - (this->_registers.p & CARRY));
 	this->_registers.a = value;
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
@@ -641,6 +668,12 @@ void CPU::TAY(uint16_t address [[maybe_unused]]) {
 	this->updateFlagNegative(this->_registers.y);
 	if (this->_debug)
 		std::cout << "TAY" << std::endl;
+}
+
+void CPU::TXS(uint16_t address [[maybe_unused]]) {
+	this->_registers.sp = this->_registers.x;
+	if (this->_debug)
+		std::cout << "TXS" << std::endl;
 }
 
 void CPU::TYA(uint16_t address [[maybe_unused]]) {
