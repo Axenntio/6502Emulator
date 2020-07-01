@@ -6,6 +6,6 @@ jsondep = dependency('jsoncpp')
 
 
 executable('emulator',
-			['main.cpp', 'Device.cpp', 'EEPROM.cpp', 'CPU.cpp', 'RAM.cpp', 'ACIA.cpp'],
+			['main.cpp', 'Config.cpp', 'Device.cpp', 'EEPROM.cpp', 'CPU.cpp', 'RAM.cpp', 'ACIA.cpp'],
 			dependencies : jsondep,
 			install : true)

@@ -5,10 +5,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
+#include "Config.hh"
 #include "CPU.hh"
-#include "EEPROM.hh"
-#include "RAM.hh"
-#include "ACIA.hh"
 
 bool running = true;
 CPU* cpu_ptr;
@@ -64,30 +62,21 @@ int main(int argc, char **argv) {
 	signal(SIGINT, signal_callback_handler);
 	signal(SIGTSTP, signal_callback_handler);
 	enable_raw_mode();
-	std::string file = "firmware";
+	std::string file = "config.json";
 	if (argc == 2)
 		file = std::string(argv[1]);
-	CPU cpu(false);
-	EEPROM eeprom(0x8000, file);
-	RAM ram(0x0000, 0x4000);
-	ACIA acia(0x6000);
-	cpu.addDevice(&ram);
-	cpu.addDevice(&acia);
-	cpu.addDevice(&eeprom);
-	cpu.readResetVector();
+	Config config(file);
+	CPU cpu = config.create_cpu();
 	cpu_ptr = &cpu;
 	while (!cpu.isHalted() && running) {
 		if (kbhit()) {
-			acia.sendChar(getch());
+			//acia.sendChar(getch());
 			//std::cout << "There is in hex: " << std::hex << int(getch()) << std::endl;
 		}
 		cpu.cycle();
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
-	}	
-	// std::cout << cpu << std::endl;
-	// std::cout << ram << std::endl;
-	// std::cout << acia << std::endl;
-	// std::cout << eeprom << std::endl;
+	}
+	std::cout << cpu << std::endl;
 	disable_raw_mode();
 	return 0;
 }
