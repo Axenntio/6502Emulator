@@ -71,6 +71,9 @@ int main(int argc, char **argv) {
 	while (!cpu.isHalted() && running) {
 		if (kbhit()) {
 			//acia.sendChar(getch());
+			if (!cpu.sendCharToAcia(getch())) {
+				std::cerr << "You don't have any ACIA to send value" << std::endl;
+			}
 			//std::cout << "There is in hex: " << std::hex << int(getch()) << std::endl;
 		}
 		cpu.cycle();

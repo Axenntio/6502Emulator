@@ -32,6 +32,7 @@ public:
 	registers_t getRegisters() const;
 	std::vector<Device*> getDevices() const;
 	void readResetVector();
+	bool sendCharToAcia(char c);
 	void cycle();
 
 	uint8_t readFromDevice(uint16_t address);

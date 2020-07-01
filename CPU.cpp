@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "CPU.hh"
+#include "ACIA.hh"
 
 CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_registers.a = 0;
@@ -297,6 +298,18 @@ registers_t CPU::getRegisters() const {
 
 void CPU::readResetVector() {
 	this->_registers.pc = this->readFromDevice(0xfffc) + (this->readFromDevice(0xfffd) << 8);
+}
+
+bool CPU::sendCharToAcia(char c) {
+	bool is_acia = false;
+	for (Device* device: this->getDevices()) {
+		ACIA* acia = dynamic_cast<ACIA*>(device);
+		if (acia != nullptr) {
+			acia->sendChar(c);
+			is_acia = true;
+		}
+	}
+	return is_acia;
 }
 
 void CPU::cycle() {
