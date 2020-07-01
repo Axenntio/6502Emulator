@@ -325,7 +325,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 	this->_registers.pc++;
 	CPU::op_t opcode = this->_op_table[instruction];
 	if (opcode.opcode == nullptr) {
-		std::cout << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << int(instruction) << std::endl;
+		std::cerr << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << int(instruction) << std::endl;
 		this->_halted = 1;
 	}
 	else {
@@ -736,7 +736,7 @@ void CPU::setFlagOverflow(bool active) {
 uint8_t CPU::readFromDevice(uint16_t address) {
 	Device* device = this->getDevice(address);
 	if (device == nullptr) {
-		std::cout << "WARNING: no device at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		std::cerr << "WARNING: no device at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return rand() % 256;
 	}
 	return device->readByte(address);
@@ -745,7 +745,7 @@ uint8_t CPU::readFromDevice(uint16_t address) {
 void CPU::writeToDevice(uint16_t address, uint8_t byte) {
 	Device* device = this->getDevice(address);
 	if (device == nullptr) {
-		std::cout << "WARNING: no device at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		std::cerr << "WARNING: no device at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return;
 	}
 	device->writeByte(address, byte);

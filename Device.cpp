@@ -25,7 +25,7 @@ uint16_t Device::getSize() const {
 
 uint8_t Device::readByte(uint16_t index) {
 	if (this->_bus_position > index || index - this->_bus_position > uint16_t(this->_memory.size())) {
-		std::cout << "WARNING: access to an unflashed byte, will get garbage at this point" << std::endl;
+		std::cerr << "WARNING: access to an unflashed byte, will get garbage at this point" << std::endl;
 		return rand() % 256;
 	}
 	return this->_memory[index - this->_bus_position];
@@ -33,7 +33,7 @@ uint8_t Device::readByte(uint16_t index) {
 
 void Device::writeByte(uint16_t index, uint8_t value) {
 	if (this->_bus_position > index || this->_bus_position - index > uint16_t(this->_memory.size())) {
-		std::cout << "ERROR: Seem you are out of device" << std::endl;
+		std::cerr << "ERROR: Seem you are out of device" << std::endl;
 		return;
 	}
 	this->_memory[index - this->_bus_position] = value;

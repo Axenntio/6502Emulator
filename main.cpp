@@ -39,13 +39,13 @@ char getch() {
 	struct termios old;
 
 	if (tcgetattr(0, &old) < 0)
-		perror("tcsetattr()");
+		std::cerr << "getch:tcsetattr()" << std::endl;
 	old.c_cc[VMIN] = 1;
 	old.c_cc[VTIME] = 0;
 	if (tcsetattr(0, TCSANOW, &old) < 0)
-		perror("tcsetattr ICANON");
+		std::cerr << "getch:tcsetattr ICANON" << std::endl;
 	if (read(0, &buf, 1) < 0)
-		perror ("read()");
+		std::cerr << "getch:read()" << std::endl;
 	return buf;
 }
 

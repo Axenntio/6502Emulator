@@ -1,6 +1,6 @@
 {
 	"CPU": {
-		"debug": true,
+		"debug": false,
 		"devices": [
 			{
 				"type": "EEPROM",

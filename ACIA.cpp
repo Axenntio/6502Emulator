@@ -13,7 +13,7 @@ ACIA::~ACIA() {
 
 uint8_t ACIA::readByte(uint16_t index) {
 	if (this->_bus_position > index || index - this->_bus_position > uint16_t(this->_memory.size())) {
-		std::cout << "WARNING: access to an unflashed byte, will get garbage at this point" << std::endl;
+		std::cerr << "WARNING: access to an unflashed byte, will get garbage at this point" << std::endl;
 		return rand() % 256;
 	}
 	switch (index - this->_bus_position) {
@@ -33,7 +33,7 @@ uint8_t ACIA::readByte(uint16_t index) {
 
 void ACIA::writeByte(uint16_t index, uint8_t value) {
 	if (this->_bus_position > index || this->_bus_position - index > uint16_t(this->_memory.size())) {
-		std::cout << "ERROR: Seem you are out of device" << std::endl;
+		std::cerr << "ERROR: Seem you are out of device" << std::endl;
 		return;
 	}
 	this->_memory[index - this->_bus_position] = value;
