@@ -2,6 +2,7 @@
 #include <fstream>
 #include <map>
 #include <any>
+#include <filesystem>
 #include "inc/Config.hh"
 #include "inc/CPU.hh"
 #include "inc/Device.hh"
@@ -11,6 +12,9 @@
 
 Config::Config(std::string filename) {
 	this->_debug = false;
+	this->_path = std::filesystem::path(filename).parent_path();
+	if (!this->_path.empty())
+		this->_path += "/";
 	std::ifstream config_file(filename, std::ifstream::binary);
 	if (!config_file.is_open()) {
 		std::cerr << "Failed loading config file" << std::endl;
@@ -50,7 +54,7 @@ CPU Config::create_cpu() const {
 		}
 
 		if (device_name == "EEPROM") {
-			device = new EEPROM(std::any_cast<uint16_t>(params["start"]), std::any_cast<std::string>(params["file"]));
+			device = new EEPROM(std::any_cast<uint16_t>(params["start"]), this->_path + std::any_cast<std::string>(params["file"]));
 		}
 		if (device_name == "RAM") {
 			device = new RAM(std::any_cast<uint16_t>(params["start"]), std::any_cast<uint16_t>(params["size"]));

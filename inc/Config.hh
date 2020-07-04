@@ -11,6 +11,7 @@ public:
 	CPU create_cpu() const;
 private:
 	bool _debug;
+	std::string _path;
 	std::vector<Json::Value> _devices;
 };
 

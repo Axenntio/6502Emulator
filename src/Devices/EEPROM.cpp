@@ -8,7 +8,7 @@ EEPROM::EEPROM(uint16_t bus_position, std::string file) : Device("EEPROM", bus_p
 	std::ifstream infile(file, std::ios_base::binary);
 
 	if (!infile.is_open()) {
-		std::cerr << "Failed loading EEPROM file" << std::endl;
+		std::cerr << "Failed loading EEPROM file (" << file << ")" << std::endl;
 		return;
 	}
     
