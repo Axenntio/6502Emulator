@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <any>
 #include "Config.hh"
 #include "CPU.hh"
 #include "Device.hh"
@@ -26,14 +28,35 @@ CPU Config::create_cpu() const {
 	for (auto device_json : this->_devices) {
 		std::string device_name = device_json["type"].asString();
 		Device* device = nullptr;
+		std::map<std::string, std::any> params;
+		params.insert(std::pair<std::string, std::any>("file", std::string("")));
+		params.insert(std::pair<std::string, std::any>("start", uint16_t(0)));
+		params.insert(std::pair<std::string, std::any>("size", uint16_t(0)));
+
+		for (const auto& kv : params) {
+			if (kv.second.type() == typeid(uint16_t)) {
+				if (device_json[kv.first] != Json::nullValue) {
+					if (device_json[kv.first].isNumeric())
+						params[kv.first] = (uint16_t)device_json[kv.first].asUInt();
+					else
+						params[kv.first] = (uint16_t)strtol(device_json[kv.first].asCString(), NULL, 16);
+				}
+			}
+			else if (kv.second.type() == typeid(std::string)) {
+				if (device_json[kv.first] != Json::nullValue) {
+					params[kv.first] = device_json[kv.first].asString();
+				}
+			}
+		}
+
 		if (device_name == "EEPROM") {
-			device = new EEPROM(device_json["start"].asUInt(), device_json["file"].asString());
+			device = new EEPROM(std::any_cast<uint16_t>(params["start"]), std::any_cast<std::string>(params["file"]));
 		}
 		if (device_name == "RAM") {
-			device = new RAM(device_json["start"].asUInt(), device_json["end"].asUInt());
+			device = new RAM(std::any_cast<uint16_t>(params["start"]), std::any_cast<uint16_t>(params["size"]));
 		}
 		if (device_name == "ACIA") {
-			device = new ACIA(device_json["start"].asUInt());
+			device = new ACIA(std::any_cast<uint16_t>(params["start"]));
 		}
 		cpu.addDevice(device);
 	}
