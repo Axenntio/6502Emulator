@@ -734,29 +734,38 @@ void CPU::setFlagOverflow(bool active) {
 }
 
 uint8_t CPU::readFromDevice(uint16_t address) {
-	Device* device = this->getDevice(address);
-	if (device == nullptr) {
+	std::vector<Device*> devices = this->getDevices(address);
+	if (devices.empty()) {
 		std::cerr << "WARNING: no device at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return rand() % 256;
 	}
-	return device->readByte(address);
+	if (devices.size() > 1) {
+		std::cerr << "WARNING: No RO managment, " << devices.size() << " devices at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		return rand() % 256;
+	}
+	return devices[0]->readByte(address);
 }
 
 void CPU::writeToDevice(uint16_t address, uint8_t byte) {
-	Device* device = this->getDevice(address);
-	if (device == nullptr) {
+	std::vector<Device*> devices = this->getDevices(address);
+	if (devices.empty()) {
 		std::cerr << "WARNING: no device at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return;
 	}
-	device->writeByte(address, byte);
+	if (devices.size() > 1) {
+		std::cerr << "WARNING: No WO managment, " << devices.size() << " devices at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		return;
+	}
+	devices[0]->writeByte(address, byte);
 }
 
-Device* CPU::getDevice(uint16_t address) {
+std::vector<Device*> CPU::getDevices(uint16_t address) const {
+	std::vector<Device*> devices;
 	for (Device* device: this->_devices) {
 		if (address >= device->getOffset() && address < device->getOffset() + device->getSize())
-			return device;
+			devices.push_back(device);
 	}
-	return nullptr;
+	return devices;
 }
 
 std::vector<Device*> CPU::getDevices() const {
