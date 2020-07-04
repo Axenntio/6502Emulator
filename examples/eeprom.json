@@ -1,0 +1,12 @@
+{
+	"CPU": {
+		"debug": true,
+		"devices": [
+			{
+				"type": "EEPROM",
+				"start": "0x8000",
+				"file": "firmware.eeprom"
+			}
+		]
+	}
+}

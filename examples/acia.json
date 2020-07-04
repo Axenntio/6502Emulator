@@ -1,0 +1,21 @@
+{
+	"CPU": {
+		"debug": false,
+		"devices": [
+			{
+				"type": "EEPROM",
+				"start": "0x8000",
+				"file": "firmware.monitor"
+			},
+			{
+				"type": "RAM",
+				"start": "0x0000",
+				"size": "0x4000"
+			},
+			{
+				"type": "ACIA",
+				"start": "0x7f00"
+			}
+		]
+	}
+}
