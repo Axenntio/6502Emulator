@@ -5,8 +5,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
-#include "Config.hh"
-#include "CPU.hh"
+#include "inc/Config.hh"
+#include "inc/CPU.hh"
 
 bool running = true;
 CPU* cpu_ptr;

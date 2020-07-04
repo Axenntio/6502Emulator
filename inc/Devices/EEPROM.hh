@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include "Device.hh"
+#include "inc/Device.hh"
 
 #ifndef __EEPROM_HH__
 #define __EEPROM_HH__

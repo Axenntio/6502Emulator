@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include "Device.hh"
+#include "inc/Device.hh"
 
 #ifndef __ACIA_HH__
 #define __ACIA_HH__

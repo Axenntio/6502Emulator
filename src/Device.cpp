@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iterator>
 #include <algorithm>
-#include "Device.hh"
+#include "inc/Device.hh"
 
 Device::Device(std::string name, uint16_t bus_position) : _name(name), _bus_position(bus_position) {
 }

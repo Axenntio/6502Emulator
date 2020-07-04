@@ -1,6 +1,5 @@
 #include <string>
 #include <vector>
-#include "types.h"
 
 #ifndef __DEVICE_HH__
 #define __DEVICE_HH__

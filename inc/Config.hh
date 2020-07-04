@@ -1,5 +1,5 @@
 #include <json/json.h>
-#include "CPU.hh"
+#include "inc/CPU.hh"
 
 #ifndef __CONFIG_HH__
 #define __CONFIG_HH__

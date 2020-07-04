@@ -4,8 +4,17 @@ project('6502 emulator', 'cpp',
 
 jsondep = dependency('jsoncpp')
 
+sources = [
+	'src/main.cpp',
+	'src/Config.cpp',
+	'src/CPU.cpp',
+	'src/Device.cpp',
+	'src/Devices/EEPROM.cpp',
+	'src/Devices/RAM.cpp',
+	'src/Devices/ACIA.cpp'
+]
 
 executable('emulator',
-			['main.cpp', 'Config.cpp', 'Device.cpp', 'EEPROM.cpp', 'CPU.cpp', 'RAM.cpp', 'ACIA.cpp'],
+			sources,
 			dependencies : jsondep,
 			install : true)

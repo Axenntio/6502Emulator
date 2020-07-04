@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iomanip>
-#include "ACIA.hh"
+#include "inc/Devices/ACIA.hh"
 
 ACIA::ACIA(uint16_t bus_position) : Device("ACIA", bus_position) {
 	this->_memory = std::vector<uint8_t>(4, 0);

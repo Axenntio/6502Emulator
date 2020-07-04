@@ -2,12 +2,12 @@
 #include <fstream>
 #include <map>
 #include <any>
-#include "Config.hh"
-#include "CPU.hh"
-#include "Device.hh"
-#include "EEPROM.hh"
-#include "RAM.hh"
-#include "ACIA.hh"
+#include "inc/Config.hh"
+#include "inc/CPU.hh"
+#include "inc/Device.hh"
+#include "inc/Devices/EEPROM.hh"
+#include "inc/Devices/RAM.hh"
+#include "inc/Devices/ACIA.hh"
 
 Config::Config(std::string filename) {
 	this->_debug = false;

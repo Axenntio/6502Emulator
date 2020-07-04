@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
-#include "CPU.hh"
-#include "ACIA.hh"
+#include "inc/CPU.hh"
+#include "inc/Devices/ACIA.hh"
 
 CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_registers.a = 0;

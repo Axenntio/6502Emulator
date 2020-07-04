@@ -1,5 +1,5 @@
 #include <vector>
-#include "Device.hh"
+#include "inc/Device.hh"
 
 #ifndef __RAM_HH__
 #define __RAM_HH__
