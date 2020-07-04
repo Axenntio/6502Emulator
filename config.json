@@ -4,17 +4,17 @@
 		"devices": [
 			{
 				"type": "EEPROM",
-				"start": 32768,
+				"start": "0x8000",
 				"file": "firmware"
 			},
 			{
 				"type": "RAM",
-				"start": 0,
-				"end": 16384
+				"start": "0x0000",
+				"size": "0x4000"
 			},
 			{
 				"type": "ACIA",
-				"start": 24576
+				"start": "0x6000"
 			}
 		]
 	}
