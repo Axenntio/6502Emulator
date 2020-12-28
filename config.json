@@ -3,18 +3,27 @@
 		"debug": false,
 		"devices": [
 			{
-				"type": "EEPROM",
-				"start": "0x8000",
-				"file": "firmware"
-			},
-			{
 				"type": "RAM",
 				"start": "0x0000",
 				"size": "0x4000"
 			},
 			{
+				"type": "VIA",
+				"start": "0x4000"
+			},
+			{
 				"type": "ACIA",
 				"start": "0x6000"
+			},
+			{
+				"type": "VIA",
+				"start": "0x8000",
+				"access_mode": "W"
+			},
+			{
+				"type": "EEPROM",
+				"start": "0x8000",
+				"file": "firmware"
 			}
 		]
 	}

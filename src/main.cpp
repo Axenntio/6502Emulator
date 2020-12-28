@@ -9,7 +9,7 @@
 #include "inc/CPU.hh"
 
 bool running = true;
-CPU* cpu_ptr;
+CPU* cpuPtr;
 
 void enable_raw_mode() {
 	termios term;
@@ -54,7 +54,7 @@ void signal_callback_handler(int signum) {
 		running = false;
 	}
 	else if (signum == SIGTSTP) {
-		cpu_ptr->toggleDebug();
+		cpuPtr->toggleDebug();
 	}
 }
 
@@ -67,10 +67,9 @@ int main(int argc, char **argv) {
 		file = std::string(argv[1]);
 	Config config(file);
 	CPU cpu = config.create_cpu();
-	cpu_ptr = &cpu;
+	cpuPtr = &cpu;
 	while (!cpu.isHalted() && running) {
 		if (kbhit()) {
-			//acia.sendChar(getch());
 			if (!cpu.sendCharToAcia(getch())) {
 				std::cerr << "You don't have any ACIA to send value" << std::endl;
 			}

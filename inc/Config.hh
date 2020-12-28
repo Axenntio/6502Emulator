@@ -6,7 +6,7 @@
 
 class Config {
 public:
-	Config(std::string config_file);
+	Config(const std::string& config_file);
 
 	CPU create_cpu() const;
 private:

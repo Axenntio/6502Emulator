@@ -9,19 +9,19 @@
 #include "inc/Devices/EEPROM.hh"
 #include "inc/Devices/RAM.hh"
 #include "inc/Devices/ACIA.hh"
+#include "inc/Devices/VIA.hh"
 
-Config::Config(std::string filename) {
+Config::Config(const std::string& filename) {
 	this->_debug = false;
 	this->_path = std::filesystem::path(filename).parent_path();
 	if (!this->_path.empty())
 		this->_path += "/";
-	std::ifstream config_file(filename, std::ifstream::binary);
-	if (!config_file.is_open()) {
-		std::cerr << "Failed loading config file" << std::endl;
-		return;
+	std::ifstream configFile(filename, std::ifstream::binary);
+	if (!configFile.is_open()) {
+		throw std::runtime_error("Failed loading config file (" + filename + ")");
 	}
 	Json::Value config;
-	config_file >> config;
+	configFile >> config;
 	this->_debug = config["CPU"]["debug"].asBool();
 	for (auto device : config["CPU"]["devices"])
 		this->_devices.push_back(device);
@@ -29,38 +29,41 @@ Config::Config(std::string filename) {
 
 CPU Config::create_cpu() const {
 	CPU cpu(this->_debug);
-	for (auto device_json : this->_devices) {
-		std::string device_name = device_json["type"].asString();
+	for (const Json::Value& jsonDevice : this->_devices) {
 		Device* device = nullptr;
 		std::map<std::string, std::any> params;
-		params.insert(std::pair<std::string, std::any>("file", std::string("")));
-		params.insert(std::pair<std::string, std::any>("start", uint16_t(0)));
-		params.insert(std::pair<std::string, std::any>("size", uint16_t(0)));
 
-		for (const auto& kv : params) {
-			if (kv.second.type() == typeid(uint16_t)) {
-				if (device_json[kv.first] != Json::nullValue) {
-					if (device_json[kv.first].isNumeric())
-						params[kv.first] = (uint16_t)device_json[kv.first].asUInt();
-					else
-						params[kv.first] = (uint16_t)strtol(device_json[kv.first].asCString(), NULL, 16);
-				}
+		for (const std::string& key : jsonDevice.getMemberNames()) {
+			if (jsonDevice[key].isNumeric()) {
+				params.insert(std::pair<std::string, std::any>(key, static_cast<uint16_t>(jsonDevice[key].asUInt())));
 			}
-			else if (kv.second.type() == typeid(std::string)) {
-				if (device_json[kv.first] != Json::nullValue) {
-					params[kv.first] = device_json[kv.first].asString();
-				}
+			else if (jsonDevice[key].asString().substr(0, 2) == "0x") {
+				params.insert(std::pair<std::string, std::any>(key, static_cast<uint16_t>(strtol(jsonDevice[key].asCString(), NULL, 16))));
+			}
+			else {
+				params.insert(std::pair<std::string, std::any>(key, jsonDevice[key].asString()));
 			}
 		}
 
-		if (device_name == "EEPROM") {
+		if (std::any_cast<std::string>(params["type"]) == "EEPROM") {
 			device = new EEPROM(std::any_cast<uint16_t>(params["start"]), this->_path + std::any_cast<std::string>(params["file"]));
 		}
-		if (device_name == "RAM") {
+		else if (std::any_cast<std::string>(params["type"]) == "RAM") {
 			device = new RAM(std::any_cast<uint16_t>(params["start"]), std::any_cast<uint16_t>(params["size"]));
 		}
-		if (device_name == "ACIA") {
+		else if (std::any_cast<std::string>(params["type"]) == "ACIA") {
 			device = new ACIA(std::any_cast<uint16_t>(params["start"]));
+		}
+		else if (std::any_cast<std::string>(params["type"]) == "VIA") {
+			if (params.find("access_mode") != params.end()) {
+				device = new VIA(std::any_cast<uint16_t>(params["start"]), std::any_cast<std::string>(params["access_mode"]));
+			}
+			else {
+				device = new VIA(std::any_cast<uint16_t>(params["start"]));
+			}
+		}
+		else {
+			throw std::runtime_error("Device named '" + std::any_cast<std::string>(params["type"]) + "' doesn't exist");
 		}
 		cpu.addDevice(device);
 	}

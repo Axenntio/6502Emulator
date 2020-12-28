@@ -5,38 +5,42 @@
 #include <algorithm>
 #include "inc/Device.hh"
 
-Device::Device(std::string name, uint16_t bus_position) : _name(name), _bus_position(bus_position) {
+Device::Device(const std::string& name, uint16_t busPosition, const std::string& accessMode) : _name(name), _busPosition(busPosition), _accessMode(accessMode) {
 }
 
 Device::~Device() {
 }
 
-std::string Device::getName() const {
+const std::string& Device::getName() const {
 	return this->_name;
 }
 
 uint16_t Device::getOffset() const {
-	return this->_bus_position;
+	return this->_busPosition;
 }
 
 uint16_t Device::getSize() const {
 	return this->_memory.size();
 }
 
+const std::string& Device::getAccessMode() const {
+	return this->_accessMode;
+}
+
 uint8_t Device::readByte(uint16_t index) {
-	if (this->_bus_position > index || index - this->_bus_position > uint16_t(this->_memory.size())) {
+	if (this->_busPosition > index || index - this->_busPosition > uint16_t(this->_memory.size())) {
 		std::cerr << "WARNING: access to an unflashed byte, will get garbage at this point" << std::endl;
 		return rand() % 256;
 	}
-	return this->_memory[index - this->_bus_position];
+	return this->_memory[index - this->_busPosition];
 }
 
 void Device::writeByte(uint16_t index, uint8_t value) {
-	if (this->_bus_position > index || this->_bus_position - index > uint16_t(this->_memory.size())) {
+	if (this->_busPosition > index || this->_busPosition - index > uint16_t(this->_memory.size())) {
 		std::cerr << "ERROR: Seem you are out of device" << std::endl;
 		return;
 	}
-	this->_memory[index - this->_bus_position] = value;
+	this->_memory[index - this->_busPosition] = value;
 }
 
 std::ostream& operator<<(std::ostream& os, Device& device) {

@@ -11,7 +11,8 @@ sources = [
 	'src/Device.cpp',
 	'src/Devices/EEPROM.cpp',
 	'src/Devices/RAM.cpp',
-	'src/Devices/ACIA.cpp'
+	'src/Devices/ACIA.cpp',
+	'src/Devices/VIA.cpp'
 ]
 
 executable('emulator',

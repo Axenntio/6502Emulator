@@ -45,7 +45,7 @@ public:
 	bool isHalted() const;
 
 private:
-	std::vector<Device*> getDevices(uint16_t address) const;
+	std::vector<Device*> getDevices(uint16_t address, char accessMode) const;
 	void parseInstructiom(uint8_t instruction);
 
 	// Addresse modes
@@ -120,7 +120,7 @@ private:
 	bool _halted;
 	bool _debug;
 	uint8_t _wait;
-	op_t _op_table[0xff];
+	op_t _opTable[0xff];
 
 	std::vector<Device*> _devices;
 };

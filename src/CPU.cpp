@@ -11,261 +11,261 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_registers.p = 0;
 	this->_registers.pc = 0;
 
-	this->_op_table[0x00] = {&CPU::BRK, &CPU::impliedAddress, 1}; // 0x00
-	this->_op_table[0x01] = {&CPU::ORA, &CPU::indirectXAddress, 6};
-	this->_op_table[0x02] = {nullptr, nullptr, 1};
-	this->_op_table[0x03] = {nullptr, nullptr, 1};
-	this->_op_table[0x04] = {nullptr, nullptr, 1};
-	this->_op_table[0x05] = {&CPU::ORA, &CPU::zeropageAddress, 3};
-	this->_op_table[0x06] = {&CPU::ASL, &CPU::zeropageAddress, 5};
-	this->_op_table[0x07] = {nullptr, nullptr, 1};
-	this->_op_table[0x08] = {&CPU::PHP, &CPU::impliedAddress, 3};
-	this->_op_table[0x09] = {&CPU::ORA, &CPU::immediateAddress, 2};
-	this->_op_table[0x0a] = {&CPU::ASL_ACC, &CPU::accumulatorAddress, 2};
-	this->_op_table[0x0b] = {nullptr, nullptr, 1};
-	this->_op_table[0x0c] = {nullptr, nullptr, 1};
-	this->_op_table[0x0d] = {&CPU::ORA, &CPU::absoluteAddress, 4};
-	this->_op_table[0x0e] = {&CPU::ASL, &CPU::absoluteAddress, 6};
-	this->_op_table[0x0f] = {nullptr, nullptr, 1};
-	this->_op_table[0x10] = {nullptr, &CPU::relativeAddress, 1}; // 0x10
-	this->_op_table[0x11] = {&CPU::ORA, &CPU::indirectYAddress, 5};
-	this->_op_table[0x12] = {nullptr, nullptr, 1};
-	this->_op_table[0x13] = {nullptr, nullptr, 1};
-	this->_op_table[0x14] = {nullptr, nullptr, 1};
-	this->_op_table[0x15] = {&CPU::ORA, &CPU::zeropageXAddress, 4};
-	this->_op_table[0x16] = {&CPU::ASL, &CPU::zeropageXAddress, 6};
-	this->_op_table[0x17] = {nullptr, nullptr, 1};
-	this->_op_table[0x18] = {&CPU::CLC, &CPU::impliedAddress, 2};
-	this->_op_table[0x19] = {&CPU::ORA, &CPU::absoluteYAddress, 4};
-	this->_op_table[0x1a] = {nullptr, nullptr, 1};
-	this->_op_table[0x1b] = {nullptr, nullptr, 1};
-	this->_op_table[0x1c] = {nullptr, nullptr, 1};
-	this->_op_table[0x1d] = {&CPU::ORA, &CPU::absoluteXAddress, 4};
-	this->_op_table[0x1e] = {&CPU::ASL, &CPU::absoluteXAddress, 7};
-	this->_op_table[0x1f] = {nullptr, nullptr, 1};
-	this->_op_table[0x20] = {&CPU::JSR, &CPU::absoluteAddress, 6}; // 0x20
-	this->_op_table[0x21] = {&CPU::AND, &CPU::indirectXAddress, 6};
-	this->_op_table[0x22] = {nullptr, nullptr, 1};
-	this->_op_table[0x23] = {nullptr, nullptr, 1};
-	this->_op_table[0x24] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x25] = {&CPU::AND, &CPU::zeropageAddress, 3};
-	this->_op_table[0x26] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x27] = {nullptr, nullptr, 1};
-	this->_op_table[0x28] = {&CPU::PLP, &CPU::impliedAddress, 4};
-	this->_op_table[0x29] = {&CPU::AND, &CPU::immediateAddress, 2};
-	this->_op_table[0x2a] = {nullptr, &CPU::accumulatorAddress, 1};
-	this->_op_table[0x2b] = {nullptr, nullptr, 1};
-	this->_op_table[0x2c] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x2d] = {&CPU::AND, &CPU::absoluteAddress, 4};
-	this->_op_table[0x2e] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x2f] = {nullptr, nullptr, 1};
-	this->_op_table[0x30] = {nullptr, &CPU::relativeAddress, 1}; // 0x30
-	this->_op_table[0x31] = {&CPU::AND, &CPU::indirectYAddress, 5};
-	this->_op_table[0x32] = {nullptr, nullptr, 1};
-	this->_op_table[0x33] = {nullptr, nullptr, 1};
-	this->_op_table[0x34] = {nullptr, nullptr, 1};
-	this->_op_table[0x35] = {&CPU::AND, &CPU::zeropageXAddress, 4};
-	this->_op_table[0x36] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0x37] = {nullptr, nullptr, 1};
-	this->_op_table[0x38] = {&CPU::SEC, &CPU::impliedAddress, 2};
-	this->_op_table[0x39] = {&CPU::AND, &CPU::absoluteYAddress, 4};
-	this->_op_table[0x3a] = {nullptr, nullptr, 1};
-	this->_op_table[0x3b] = {nullptr, nullptr, 1};
-	this->_op_table[0x3c] = {nullptr, nullptr, 1};
-	this->_op_table[0x3d] = {&CPU::AND, &CPU::absoluteXAddress, 4};
-	this->_op_table[0x3e] = {nullptr, &CPU::absoluteXAddress, 1};
-	this->_op_table[0x3f] = {nullptr, nullptr, 1};
-	this->_op_table[0x40] = {nullptr, &CPU::impliedAddress, 1}; // 0x40
-	this->_op_table[0x41] = {nullptr, &CPU::indirectXAddress, 1};
-	this->_op_table[0x42] = {nullptr, nullptr, 1};
-	this->_op_table[0x43] = {nullptr, nullptr, 1};
-	this->_op_table[0x44] = {nullptr, nullptr, 1};
-	this->_op_table[0x45] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x46] = {&CPU::LSR, &CPU::zeropageAddress, 5};
-	this->_op_table[0x47] = {nullptr, nullptr, 1};
-	this->_op_table[0x48] = {&CPU::PHA, &CPU::impliedAddress, 3};
-	this->_op_table[0x49] = {nullptr, &CPU::immediateAddress, 1};
-	this->_op_table[0x4a] = {&CPU::LSR_ACC, &CPU::accumulatorAddress, 2};
-	this->_op_table[0x4b] = {nullptr, nullptr, 1};
-	this->_op_table[0x4c] = {&CPU::JMP,   &CPU::absoluteAddress, 3};
-	this->_op_table[0x4d] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x4e] = {&CPU::LSR, &CPU::absoluteAddress, 6};
-	this->_op_table[0x4f] = {nullptr, nullptr, 1};
-	this->_op_table[0x50] = {nullptr, &CPU::relativeAddress, 1}; // 0x50
-	this->_op_table[0x51] = {nullptr, &CPU::indirectYAddress, 1};
-	this->_op_table[0x52] = {nullptr, nullptr, 1};
-	this->_op_table[0x53] = {nullptr, nullptr, 1};
-	this->_op_table[0x54] = {nullptr, nullptr, 1};
-	this->_op_table[0x55] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0x56] = {&CPU::LSR, &CPU::zeropageXAddress, 6};
-	this->_op_table[0x57] = {nullptr, nullptr, 1};
-	this->_op_table[0x58] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0x59] = {nullptr, &CPU::absoluteYAddress, 1};
-	this->_op_table[0x5a] = {nullptr, nullptr, 1};
-	this->_op_table[0x5b] = {nullptr, nullptr, 1};
-	this->_op_table[0x5c] = {nullptr, nullptr, 1};
-	this->_op_table[0x5d] = {nullptr, &CPU::absoluteXAddress, 1};
-	this->_op_table[0x5e] = {&CPU::LSR, &CPU::absoluteXAddress, 7};
-	this->_op_table[0x5f] = {nullptr, nullptr, 1};
-	this->_op_table[0x60] = {&CPU::RTS, &CPU::impliedAddress, 6}; // 0x60
-	this->_op_table[0x61] = {&CPU::ADC, &CPU::indirectXAddress, 6};
-	this->_op_table[0x62] = {nullptr, nullptr, 1};
-	this->_op_table[0x63] = {nullptr, nullptr, 1};
-	this->_op_table[0x64] = {nullptr, nullptr, 1};
-	this->_op_table[0x65] = {&CPU::ADC, &CPU::zeropageAddress, 3};
-	this->_op_table[0x66] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x67] = {nullptr, nullptr, 1};
-	this->_op_table[0x68] = {&CPU::PLA, &CPU::impliedAddress, 4};
-	this->_op_table[0x69] = {&CPU::ADC, &CPU::immediateAddress, 2};
-	this->_op_table[0x6a] = {nullptr, &CPU::accumulatorAddress, 1};
-	this->_op_table[0x6b] = {nullptr, nullptr, 1};
-	this->_op_table[0x6c] = {nullptr, &CPU::indirectAddress, 1};
-	this->_op_table[0x6d] = {&CPU::ADC, &CPU::absoluteAddress, 4};
-	this->_op_table[0x6e] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x6f] = {nullptr, nullptr, 1};
-	this->_op_table[0x70] = {nullptr, &CPU::relativeAddress, 1}; // 0x70
-	this->_op_table[0x71] = {&CPU::ADC, &CPU::indirectYAddress, 5};
-	this->_op_table[0x72] = {nullptr, nullptr, 1};
-	this->_op_table[0x73] = {nullptr, nullptr, 1};
-	this->_op_table[0x74] = {nullptr, nullptr, 1};
-	this->_op_table[0x75] = {&CPU::ADC, &CPU::zeropageXAddress, 4};
-	this->_op_table[0x76] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0x77] = {nullptr, nullptr, 1};
-	this->_op_table[0x78] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0x79] = {&CPU::ADC, &CPU::absoluteYAddress, 4};
-	this->_op_table[0x7a] = {nullptr, nullptr, 1};
-	this->_op_table[0x7b] = {nullptr, nullptr, 1};
-	this->_op_table[0x7c] = {nullptr, nullptr, 1};
-	this->_op_table[0x7d] = {&CPU::ADC, &CPU::absoluteXAddress, 4};
-	this->_op_table[0x7e] = {nullptr, &CPU::absoluteXAddress, 1};
-	this->_op_table[0x7f] = {nullptr, nullptr, 1};
-	this->_op_table[0x80] = {nullptr, nullptr, 1}; // 0x80
-	this->_op_table[0x81] = {&CPU::STA, &CPU::indirectXAddress, 6};
-	this->_op_table[0x82] = {nullptr, nullptr, 1};
-	this->_op_table[0x83] = {nullptr, nullptr, 1};
-	this->_op_table[0x84] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x85] = {&CPU::STA, &CPU::zeropageAddress, 3};
-	this->_op_table[0x86] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0x87] = {nullptr, nullptr, 1};
-	this->_op_table[0x88] = {&CPU::DEY, &CPU::impliedAddress, 2};
-	this->_op_table[0x89] = {nullptr, nullptr, 1};
-	this->_op_table[0x8a] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0x8b] = {nullptr, nullptr, 1};
-	this->_op_table[0x8c] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x8d] = {&CPU::STA, &CPU::absoluteAddress, 4};
-	this->_op_table[0x8e] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0x8f] = {nullptr, nullptr, 1};
-	this->_op_table[0x90] = {&CPU::BCC, &CPU::relativeAddress, 2}; // 0x90
-	this->_op_table[0x91] = {&CPU::STA, &CPU::indirectYAddress, 6};
-	this->_op_table[0x92] = {nullptr, nullptr, 1};
-	this->_op_table[0x93] = {nullptr, nullptr, 1};
-	this->_op_table[0x94] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0x95] = {&CPU::STA, &CPU::zeropageXAddress, 4};
-	this->_op_table[0x96] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0x97] = {nullptr, nullptr, 1};
-	this->_op_table[0x98] = {&CPU::TYA, &CPU::impliedAddress, 2};
-	this->_op_table[0x99] = {&CPU::STA, &CPU::absoluteYAddress, 5};
-	this->_op_table[0x9a] = {&CPU::TXS, &CPU::impliedAddress, 2};
-	this->_op_table[0x9b] = {nullptr, nullptr, 1};
-	this->_op_table[0x9c] = {nullptr, nullptr, 1};
-	this->_op_table[0x9d] = {&CPU::STA, &CPU::absoluteXAddress, 5};
-	this->_op_table[0x9e] = {nullptr, nullptr, 1};
-	this->_op_table[0x9f] = {nullptr, nullptr, 1};
-	this->_op_table[0xa0] = {&CPU::LDY, &CPU::immediateAddress, 2}; // 0xa0
-	this->_op_table[0xa1] = {&CPU::LDA, &CPU::indirectXAddress, 6};
-	this->_op_table[0xa2] = {&CPU::LDX, &CPU::immediateAddress, 2};
-	this->_op_table[0xa3] = {nullptr, nullptr, 1};
-	this->_op_table[0xa4] = {&CPU::LDY, &CPU::zeropageAddress, 3};
-	this->_op_table[0xa5] = {&CPU::LDA, &CPU::zeropageAddress, 3};
-	this->_op_table[0xa6] = {&CPU::LDX, &CPU::zeropageAddress, 3};
-	this->_op_table[0xa7] = {nullptr, nullptr, 1};
-	this->_op_table[0xa8] = {&CPU::TAY, &CPU::impliedAddress, 2};
-	this->_op_table[0xa9] = {&CPU::LDA, &CPU::immediateAddress, 2};
-	this->_op_table[0xaa] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0xab] = {nullptr, nullptr, 1};
-	this->_op_table[0xac] = {&CPU::LDY, &CPU::absoluteAddress, 4};
-	this->_op_table[0xad] = {&CPU::LDA, &CPU::absoluteAddress, 4};
-	this->_op_table[0xae] = {&CPU::LDX, &CPU::absoluteAddress, 4};
-	this->_op_table[0xaf] = {nullptr, nullptr, 1};
-	this->_op_table[0xb0] = {&CPU::BCS, &CPU::relativeAddress, 2}; // 0xb0
-	this->_op_table[0xb1] = {&CPU::LDA, &CPU::indirectYAddress, 5};
-	this->_op_table[0xb2] = {nullptr, nullptr, 1};
-	this->_op_table[0xb3] = {nullptr, nullptr, 1};
-	this->_op_table[0xb4] = {&CPU::LDY, &CPU::zeropageXAddress, 4};
-	this->_op_table[0xb5] = {&CPU::LDA, &CPU::zeropageXAddress, 4};
-	this->_op_table[0xb6] = {&CPU::LDX, &CPU::zeropageYAddress, 4};
-	this->_op_table[0xb7] = {nullptr, nullptr, 1};
-	this->_op_table[0xb8] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0xb9] = {&CPU::LDA, &CPU::absoluteYAddress, 4};
-	this->_op_table[0xba] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0xbb] = {nullptr, nullptr, 1};
-	this->_op_table[0xbc] = {&CPU::LDY, &CPU::absoluteXAddress, 4};
-	this->_op_table[0xbd] = {&CPU::LDA, &CPU::absoluteXAddress, 4};
-	this->_op_table[0xbe] = {&CPU::LDX, &CPU::absoluteYAddress, 4};
-	this->_op_table[0xbf] = {nullptr, nullptr, 1};
-	this->_op_table[0xc0] = {&CPU::CPY, &CPU::immediateAddress, 2}; // 0xc0
-	this->_op_table[0xc1] = {&CPU::CMP, &CPU::indirectXAddress, 6};
-	this->_op_table[0xc2] = {nullptr, nullptr, 1};
-	this->_op_table[0xc3] = {nullptr, nullptr, 1};
-	this->_op_table[0xc4] = {&CPU::CPY, &CPU::zeropageAddress, 3};
-	this->_op_table[0xc5] = {&CPU::CMP, &CPU::zeropageAddress, 3};
-	this->_op_table[0xc6] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0xc7] = {nullptr, nullptr, 1};
-	this->_op_table[0xc8] = {&CPU::INY, &CPU::impliedAddress, 2};
-	this->_op_table[0xc9] = {&CPU::CMP, &CPU::immediateAddress, 2};
-	this->_op_table[0xca] = {&CPU::DEX, &CPU::impliedAddress, 2};
-	this->_op_table[0xcb] = {nullptr, nullptr, 1};
-	this->_op_table[0xcc] = {&CPU::CPY, &CPU::absoluteAddress, 4};
-	this->_op_table[0xcd] = {&CPU::CMP, &CPU::absoluteAddress, 4};
-	this->_op_table[0xce] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0xcf] = {nullptr, nullptr, 1};
-	this->_op_table[0xd0] = {&CPU::BNE, &CPU::relativeAddress, 2}; // 0xd0
-	this->_op_table[0xd1] = {&CPU::CMP, &CPU::indirectYAddress, 5};
-	this->_op_table[0xd2] = {nullptr, nullptr, 1};
-	this->_op_table[0xd3] = {nullptr, nullptr, 1};
-	this->_op_table[0xd4] = {nullptr, nullptr, 1};
-	this->_op_table[0xd5] = {&CPU::CMP, &CPU::zeropageXAddress, 4};
-	this->_op_table[0xd6] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0xd7] = {nullptr, nullptr, 1};
-	this->_op_table[0xd8] = {&CPU::CLD, &CPU::impliedAddress, 2};
-	this->_op_table[0xd9] = {&CPU::CMP, &CPU::absoluteYAddress, 4};
-	this->_op_table[0xda] = {nullptr, nullptr, 1};
-	this->_op_table[0xdb] = {nullptr, nullptr, 1};
-	this->_op_table[0xdc] = {nullptr, nullptr, 1};
-	this->_op_table[0xdd] = {&CPU::CMP, &CPU::absoluteXAddress, 4};
-	this->_op_table[0xde] = {nullptr, &CPU::absoluteXAddress, 1};
-	this->_op_table[0xdf] = {nullptr, nullptr, 1};
-	this->_op_table[0xe0] = {&CPU::CPX, &CPU::immediateAddress, 2}; // 0xe0
-	this->_op_table[0xe1] = {&CPU::SBC, &CPU::indirectXAddress, 6};
-	this->_op_table[0xe2] = {nullptr, nullptr, 1};
-	this->_op_table[0xe3] = {nullptr, nullptr, 1};
-	this->_op_table[0xe4] = {&CPU::CPX, &CPU::zeropageAddress, 3};
-	this->_op_table[0xe5] = {&CPU::SBC, &CPU::zeropageAddress, 3};
-	this->_op_table[0xe6] = {nullptr, &CPU::zeropageAddress, 1};
-	this->_op_table[0xe7] = {nullptr, nullptr, 1};
-	this->_op_table[0xe8] = {&CPU::INX, &CPU::impliedAddress, 2};
-	this->_op_table[0xe9] = {&CPU::SBC, &CPU::immediateAddress, 2};
-	this->_op_table[0xea] = {&CPU::NOP, &CPU::impliedAddress, 1};
-	this->_op_table[0xeb] = {nullptr, nullptr, 1};
-	this->_op_table[0xec] = {&CPU::CPX, &CPU::absoluteAddress, 4};
-	this->_op_table[0xed] = {&CPU::SBC, &CPU::absoluteAddress, 4};
-	this->_op_table[0xee] = {nullptr, &CPU::absoluteAddress, 1};
-	this->_op_table[0xef] = {nullptr, nullptr, 1};
-	this->_op_table[0xf0] = {&CPU::BEQ, &CPU::relativeAddress, 2}; // 0xf0
-	this->_op_table[0xf1] = {&CPU::SBC, &CPU::indirectYAddress, 5};
-	this->_op_table[0xf2] = {nullptr, nullptr, 1};
-	this->_op_table[0xf3] = {nullptr, nullptr, 1};
-	this->_op_table[0xf4] = {nullptr, nullptr, 1};
-	this->_op_table[0xf5] = {&CPU::SBC, &CPU::zeropageXAddress, 4};
-	this->_op_table[0xf6] = {nullptr, &CPU::zeropageXAddress, 1};
-	this->_op_table[0xf7] = {nullptr, nullptr, 1};
-	this->_op_table[0xf8] = {nullptr, &CPU::impliedAddress, 1};
-	this->_op_table[0xf9] = {&CPU::SBC, &CPU::absoluteYAddress, 4};
-	this->_op_table[0xfa] = {nullptr, nullptr, 1};
-	this->_op_table[0xfb] = {nullptr, nullptr, 1};
-	this->_op_table[0xfc] = {nullptr, nullptr, 1};
-	this->_op_table[0xfd] = {&CPU::SBC, &CPU::absoluteXAddress, 4};
-	this->_op_table[0xfe] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0x00] = {&CPU::BRK, &CPU::impliedAddress, 1}; // 0x00
+	this->_opTable[0x01] = {&CPU::ORA, &CPU::indirectXAddress, 6};
+	this->_opTable[0x02] = {nullptr, nullptr, 1};
+	this->_opTable[0x03] = {nullptr, nullptr, 1};
+	this->_opTable[0x04] = {nullptr, nullptr, 1};
+	this->_opTable[0x05] = {&CPU::ORA, &CPU::zeropageAddress, 3};
+	this->_opTable[0x06] = {&CPU::ASL, &CPU::zeropageAddress, 5};
+	this->_opTable[0x07] = {nullptr, nullptr, 1};
+	this->_opTable[0x08] = {&CPU::PHP, &CPU::impliedAddress, 3};
+	this->_opTable[0x09] = {&CPU::ORA, &CPU::immediateAddress, 2};
+	this->_opTable[0x0a] = {&CPU::ASL_ACC, &CPU::accumulatorAddress, 2};
+	this->_opTable[0x0b] = {nullptr, nullptr, 1};
+	this->_opTable[0x0c] = {nullptr, nullptr, 1};
+	this->_opTable[0x0d] = {&CPU::ORA, &CPU::absoluteAddress, 4};
+	this->_opTable[0x0e] = {&CPU::ASL, &CPU::absoluteAddress, 6};
+	this->_opTable[0x0f] = {nullptr, nullptr, 1};
+	this->_opTable[0x10] = {nullptr, &CPU::relativeAddress, 1}; // 0x10
+	this->_opTable[0x11] = {&CPU::ORA, &CPU::indirectYAddress, 5};
+	this->_opTable[0x12] = {nullptr, nullptr, 1};
+	this->_opTable[0x13] = {nullptr, nullptr, 1};
+	this->_opTable[0x14] = {nullptr, nullptr, 1};
+	this->_opTable[0x15] = {&CPU::ORA, &CPU::zeropageXAddress, 4};
+	this->_opTable[0x16] = {&CPU::ASL, &CPU::zeropageXAddress, 6};
+	this->_opTable[0x17] = {nullptr, nullptr, 1};
+	this->_opTable[0x18] = {&CPU::CLC, &CPU::impliedAddress, 2};
+	this->_opTable[0x19] = {&CPU::ORA, &CPU::absoluteYAddress, 4};
+	this->_opTable[0x1a] = {nullptr, nullptr, 1};
+	this->_opTable[0x1b] = {nullptr, nullptr, 1};
+	this->_opTable[0x1c] = {nullptr, nullptr, 1};
+	this->_opTable[0x1d] = {&CPU::ORA, &CPU::absoluteXAddress, 4};
+	this->_opTable[0x1e] = {&CPU::ASL, &CPU::absoluteXAddress, 7};
+	this->_opTable[0x1f] = {nullptr, nullptr, 1};
+	this->_opTable[0x20] = {&CPU::JSR, &CPU::absoluteAddress, 6}; // 0x20
+	this->_opTable[0x21] = {&CPU::AND, &CPU::indirectXAddress, 6};
+	this->_opTable[0x22] = {nullptr, nullptr, 1};
+	this->_opTable[0x23] = {nullptr, nullptr, 1};
+	this->_opTable[0x24] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x25] = {&CPU::AND, &CPU::zeropageAddress, 3};
+	this->_opTable[0x26] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x27] = {nullptr, nullptr, 1};
+	this->_opTable[0x28] = {&CPU::PLP, &CPU::impliedAddress, 4};
+	this->_opTable[0x29] = {&CPU::AND, &CPU::immediateAddress, 2};
+	this->_opTable[0x2a] = {nullptr, &CPU::accumulatorAddress, 1};
+	this->_opTable[0x2b] = {nullptr, nullptr, 1};
+	this->_opTable[0x2c] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x2d] = {&CPU::AND, &CPU::absoluteAddress, 4};
+	this->_opTable[0x2e] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x2f] = {nullptr, nullptr, 1};
+	this->_opTable[0x30] = {nullptr, &CPU::relativeAddress, 1}; // 0x30
+	this->_opTable[0x31] = {&CPU::AND, &CPU::indirectYAddress, 5};
+	this->_opTable[0x32] = {nullptr, nullptr, 1};
+	this->_opTable[0x33] = {nullptr, nullptr, 1};
+	this->_opTable[0x34] = {nullptr, nullptr, 1};
+	this->_opTable[0x35] = {&CPU::AND, &CPU::zeropageXAddress, 4};
+	this->_opTable[0x36] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x37] = {nullptr, nullptr, 1};
+	this->_opTable[0x38] = {&CPU::SEC, &CPU::impliedAddress, 2};
+	this->_opTable[0x39] = {&CPU::AND, &CPU::absoluteYAddress, 4};
+	this->_opTable[0x3a] = {nullptr, nullptr, 1};
+	this->_opTable[0x3b] = {nullptr, nullptr, 1};
+	this->_opTable[0x3c] = {nullptr, nullptr, 1};
+	this->_opTable[0x3d] = {&CPU::AND, &CPU::absoluteXAddress, 4};
+	this->_opTable[0x3e] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0x3f] = {nullptr, nullptr, 1};
+	this->_opTable[0x40] = {nullptr, &CPU::impliedAddress, 1}; // 0x40
+	this->_opTable[0x41] = {nullptr, &CPU::indirectXAddress, 1};
+	this->_opTable[0x42] = {nullptr, nullptr, 1};
+	this->_opTable[0x43] = {nullptr, nullptr, 1};
+	this->_opTable[0x44] = {nullptr, nullptr, 1};
+	this->_opTable[0x45] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x46] = {&CPU::LSR, &CPU::zeropageAddress, 5};
+	this->_opTable[0x47] = {nullptr, nullptr, 1};
+	this->_opTable[0x48] = {&CPU::PHA, &CPU::impliedAddress, 3};
+	this->_opTable[0x49] = {nullptr, &CPU::immediateAddress, 1};
+	this->_opTable[0x4a] = {&CPU::LSR_ACC, &CPU::accumulatorAddress, 2};
+	this->_opTable[0x4b] = {nullptr, nullptr, 1};
+	this->_opTable[0x4c] = {&CPU::JMP,   &CPU::absoluteAddress, 3};
+	this->_opTable[0x4d] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x4e] = {&CPU::LSR, &CPU::absoluteAddress, 6};
+	this->_opTable[0x4f] = {nullptr, nullptr, 1};
+	this->_opTable[0x50] = {nullptr, &CPU::relativeAddress, 1}; // 0x50
+	this->_opTable[0x51] = {nullptr, &CPU::indirectYAddress, 1};
+	this->_opTable[0x52] = {nullptr, nullptr, 1};
+	this->_opTable[0x53] = {nullptr, nullptr, 1};
+	this->_opTable[0x54] = {nullptr, nullptr, 1};
+	this->_opTable[0x55] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x56] = {&CPU::LSR, &CPU::zeropageXAddress, 6};
+	this->_opTable[0x57] = {nullptr, nullptr, 1};
+	this->_opTable[0x58] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0x59] = {nullptr, &CPU::absoluteYAddress, 1};
+	this->_opTable[0x5a] = {nullptr, nullptr, 1};
+	this->_opTable[0x5b] = {nullptr, nullptr, 1};
+	this->_opTable[0x5c] = {nullptr, nullptr, 1};
+	this->_opTable[0x5d] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0x5e] = {&CPU::LSR, &CPU::absoluteXAddress, 7};
+	this->_opTable[0x5f] = {nullptr, nullptr, 1};
+	this->_opTable[0x60] = {&CPU::RTS, &CPU::impliedAddress, 6}; // 0x60
+	this->_opTable[0x61] = {&CPU::ADC, &CPU::indirectXAddress, 6};
+	this->_opTable[0x62] = {nullptr, nullptr, 1};
+	this->_opTable[0x63] = {nullptr, nullptr, 1};
+	this->_opTable[0x64] = {nullptr, nullptr, 1};
+	this->_opTable[0x65] = {&CPU::ADC, &CPU::zeropageAddress, 3};
+	this->_opTable[0x66] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x67] = {nullptr, nullptr, 1};
+	this->_opTable[0x68] = {&CPU::PLA, &CPU::impliedAddress, 4};
+	this->_opTable[0x69] = {&CPU::ADC, &CPU::immediateAddress, 2};
+	this->_opTable[0x6a] = {nullptr, &CPU::accumulatorAddress, 1};
+	this->_opTable[0x6b] = {nullptr, nullptr, 1};
+	this->_opTable[0x6c] = {nullptr, &CPU::indirectAddress, 1};
+	this->_opTable[0x6d] = {&CPU::ADC, &CPU::absoluteAddress, 4};
+	this->_opTable[0x6e] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x6f] = {nullptr, nullptr, 1};
+	this->_opTable[0x70] = {nullptr, &CPU::relativeAddress, 1}; // 0x70
+	this->_opTable[0x71] = {&CPU::ADC, &CPU::indirectYAddress, 5};
+	this->_opTable[0x72] = {nullptr, nullptr, 1};
+	this->_opTable[0x73] = {nullptr, nullptr, 1};
+	this->_opTable[0x74] = {nullptr, nullptr, 1};
+	this->_opTable[0x75] = {&CPU::ADC, &CPU::zeropageXAddress, 4};
+	this->_opTable[0x76] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x77] = {nullptr, nullptr, 1};
+	this->_opTable[0x78] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0x79] = {&CPU::ADC, &CPU::absoluteYAddress, 4};
+	this->_opTable[0x7a] = {nullptr, nullptr, 1};
+	this->_opTable[0x7b] = {nullptr, nullptr, 1};
+	this->_opTable[0x7c] = {nullptr, nullptr, 1};
+	this->_opTable[0x7d] = {&CPU::ADC, &CPU::absoluteXAddress, 4};
+	this->_opTable[0x7e] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0x7f] = {nullptr, nullptr, 1};
+	this->_opTable[0x80] = {nullptr, nullptr, 1}; // 0x80
+	this->_opTable[0x81] = {&CPU::STA, &CPU::indirectXAddress, 6};
+	this->_opTable[0x82] = {nullptr, nullptr, 1};
+	this->_opTable[0x83] = {nullptr, nullptr, 1};
+	this->_opTable[0x84] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x85] = {&CPU::STA, &CPU::zeropageAddress, 3};
+	this->_opTable[0x86] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x87] = {nullptr, nullptr, 1};
+	this->_opTable[0x88] = {&CPU::DEY, &CPU::impliedAddress, 2};
+	this->_opTable[0x89] = {nullptr, nullptr, 1};
+	this->_opTable[0x8a] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0x8b] = {nullptr, nullptr, 1};
+	this->_opTable[0x8c] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x8d] = {&CPU::STA, &CPU::absoluteAddress, 4};
+	this->_opTable[0x8e] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x8f] = {nullptr, nullptr, 1};
+	this->_opTable[0x90] = {&CPU::BCC, &CPU::relativeAddress, 2}; // 0x90
+	this->_opTable[0x91] = {&CPU::STA, &CPU::indirectYAddress, 6};
+	this->_opTable[0x92] = {nullptr, nullptr, 1};
+	this->_opTable[0x93] = {nullptr, nullptr, 1};
+	this->_opTable[0x94] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x95] = {&CPU::STA, &CPU::zeropageXAddress, 4};
+	this->_opTable[0x96] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x97] = {nullptr, nullptr, 1};
+	this->_opTable[0x98] = {&CPU::TYA, &CPU::impliedAddress, 2};
+	this->_opTable[0x99] = {&CPU::STA, &CPU::absoluteYAddress, 5};
+	this->_opTable[0x9a] = {&CPU::TXS, &CPU::impliedAddress, 2};
+	this->_opTable[0x9b] = {nullptr, nullptr, 1};
+	this->_opTable[0x9c] = {nullptr, nullptr, 1};
+	this->_opTable[0x9d] = {&CPU::STA, &CPU::absoluteXAddress, 5};
+	this->_opTable[0x9e] = {nullptr, nullptr, 1};
+	this->_opTable[0x9f] = {nullptr, nullptr, 1};
+	this->_opTable[0xa0] = {&CPU::LDY, &CPU::immediateAddress, 2}; // 0xa0
+	this->_opTable[0xa1] = {&CPU::LDA, &CPU::indirectXAddress, 6};
+	this->_opTable[0xa2] = {&CPU::LDX, &CPU::immediateAddress, 2};
+	this->_opTable[0xa3] = {nullptr, nullptr, 1};
+	this->_opTable[0xa4] = {&CPU::LDY, &CPU::zeropageAddress, 3};
+	this->_opTable[0xa5] = {&CPU::LDA, &CPU::zeropageAddress, 3};
+	this->_opTable[0xa6] = {&CPU::LDX, &CPU::zeropageAddress, 3};
+	this->_opTable[0xa7] = {nullptr, nullptr, 1};
+	this->_opTable[0xa8] = {&CPU::TAY, &CPU::impliedAddress, 2};
+	this->_opTable[0xa9] = {&CPU::LDA, &CPU::immediateAddress, 2};
+	this->_opTable[0xaa] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0xab] = {nullptr, nullptr, 1};
+	this->_opTable[0xac] = {&CPU::LDY, &CPU::absoluteAddress, 4};
+	this->_opTable[0xad] = {&CPU::LDA, &CPU::absoluteAddress, 4};
+	this->_opTable[0xae] = {&CPU::LDX, &CPU::absoluteAddress, 4};
+	this->_opTable[0xaf] = {nullptr, nullptr, 1};
+	this->_opTable[0xb0] = {&CPU::BCS, &CPU::relativeAddress, 2}; // 0xb0
+	this->_opTable[0xb1] = {&CPU::LDA, &CPU::indirectYAddress, 5};
+	this->_opTable[0xb2] = {nullptr, nullptr, 1};
+	this->_opTable[0xb3] = {nullptr, nullptr, 1};
+	this->_opTable[0xb4] = {&CPU::LDY, &CPU::zeropageXAddress, 4};
+	this->_opTable[0xb5] = {&CPU::LDA, &CPU::zeropageXAddress, 4};
+	this->_opTable[0xb6] = {&CPU::LDX, &CPU::zeropageYAddress, 4};
+	this->_opTable[0xb7] = {nullptr, nullptr, 1};
+	this->_opTable[0xb8] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0xb9] = {&CPU::LDA, &CPU::absoluteYAddress, 4};
+	this->_opTable[0xba] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0xbb] = {nullptr, nullptr, 1};
+	this->_opTable[0xbc] = {&CPU::LDY, &CPU::absoluteXAddress, 4};
+	this->_opTable[0xbd] = {&CPU::LDA, &CPU::absoluteXAddress, 4};
+	this->_opTable[0xbe] = {&CPU::LDX, &CPU::absoluteYAddress, 4};
+	this->_opTable[0xbf] = {nullptr, nullptr, 1};
+	this->_opTable[0xc0] = {&CPU::CPY, &CPU::immediateAddress, 2}; // 0xc0
+	this->_opTable[0xc1] = {&CPU::CMP, &CPU::indirectXAddress, 6};
+	this->_opTable[0xc2] = {nullptr, nullptr, 1};
+	this->_opTable[0xc3] = {nullptr, nullptr, 1};
+	this->_opTable[0xc4] = {&CPU::CPY, &CPU::zeropageAddress, 3};
+	this->_opTable[0xc5] = {&CPU::CMP, &CPU::zeropageAddress, 3};
+	this->_opTable[0xc6] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0xc7] = {nullptr, nullptr, 1};
+	this->_opTable[0xc8] = {&CPU::INY, &CPU::impliedAddress, 2};
+	this->_opTable[0xc9] = {&CPU::CMP, &CPU::immediateAddress, 2};
+	this->_opTable[0xca] = {&CPU::DEX, &CPU::impliedAddress, 2};
+	this->_opTable[0xcb] = {nullptr, nullptr, 1};
+	this->_opTable[0xcc] = {&CPU::CPY, &CPU::absoluteAddress, 4};
+	this->_opTable[0xcd] = {&CPU::CMP, &CPU::absoluteAddress, 4};
+	this->_opTable[0xce] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0xcf] = {nullptr, nullptr, 1};
+	this->_opTable[0xd0] = {&CPU::BNE, &CPU::relativeAddress, 2}; // 0xd0
+	this->_opTable[0xd1] = {&CPU::CMP, &CPU::indirectYAddress, 5};
+	this->_opTable[0xd2] = {nullptr, nullptr, 1};
+	this->_opTable[0xd3] = {nullptr, nullptr, 1};
+	this->_opTable[0xd4] = {nullptr, nullptr, 1};
+	this->_opTable[0xd5] = {&CPU::CMP, &CPU::zeropageXAddress, 4};
+	this->_opTable[0xd6] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0xd7] = {nullptr, nullptr, 1};
+	this->_opTable[0xd8] = {&CPU::CLD, &CPU::impliedAddress, 2};
+	this->_opTable[0xd9] = {&CPU::CMP, &CPU::absoluteYAddress, 4};
+	this->_opTable[0xda] = {nullptr, nullptr, 1};
+	this->_opTable[0xdb] = {nullptr, nullptr, 1};
+	this->_opTable[0xdc] = {nullptr, nullptr, 1};
+	this->_opTable[0xdd] = {&CPU::CMP, &CPU::absoluteXAddress, 4};
+	this->_opTable[0xde] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0xdf] = {nullptr, nullptr, 1};
+	this->_opTable[0xe0] = {&CPU::CPX, &CPU::immediateAddress, 2}; // 0xe0
+	this->_opTable[0xe1] = {&CPU::SBC, &CPU::indirectXAddress, 6};
+	this->_opTable[0xe2] = {nullptr, nullptr, 1};
+	this->_opTable[0xe3] = {nullptr, nullptr, 1};
+	this->_opTable[0xe4] = {&CPU::CPX, &CPU::zeropageAddress, 3};
+	this->_opTable[0xe5] = {&CPU::SBC, &CPU::zeropageAddress, 3};
+	this->_opTable[0xe6] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0xe7] = {nullptr, nullptr, 1};
+	this->_opTable[0xe8] = {&CPU::INX, &CPU::impliedAddress, 2};
+	this->_opTable[0xe9] = {&CPU::SBC, &CPU::immediateAddress, 2};
+	this->_opTable[0xea] = {&CPU::NOP, &CPU::impliedAddress, 1};
+	this->_opTable[0xeb] = {nullptr, nullptr, 1};
+	this->_opTable[0xec] = {&CPU::CPX, &CPU::absoluteAddress, 4};
+	this->_opTable[0xed] = {&CPU::SBC, &CPU::absoluteAddress, 4};
+	this->_opTable[0xee] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0xef] = {nullptr, nullptr, 1};
+	this->_opTable[0xf0] = {&CPU::BEQ, &CPU::relativeAddress, 2}; // 0xf0
+	this->_opTable[0xf1] = {&CPU::SBC, &CPU::indirectYAddress, 5};
+	this->_opTable[0xf2] = {nullptr, nullptr, 1};
+	this->_opTable[0xf3] = {nullptr, nullptr, 1};
+	this->_opTable[0xf4] = {nullptr, nullptr, 1};
+	this->_opTable[0xf5] = {&CPU::SBC, &CPU::zeropageXAddress, 4};
+	this->_opTable[0xf6] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0xf7] = {nullptr, nullptr, 1};
+	this->_opTable[0xf8] = {nullptr, &CPU::impliedAddress, 1};
+	this->_opTable[0xf9] = {&CPU::SBC, &CPU::absoluteYAddress, 4};
+	this->_opTable[0xfa] = {nullptr, nullptr, 1};
+	this->_opTable[0xfb] = {nullptr, nullptr, 1};
+	this->_opTable[0xfc] = {nullptr, nullptr, 1};
+	this->_opTable[0xfd] = {&CPU::SBC, &CPU::absoluteXAddress, 4};
+	this->_opTable[0xfe] = {nullptr, &CPU::absoluteXAddress, 1};
 }
 
 CPU::~CPU() {
@@ -323,7 +323,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 	if (this->_debug)
 		std::cout << std::setfill('0') << std::setw(4) << std::hex << this->_registers.pc << ":\t";
 	this->_registers.pc++;
-	CPU::op_t opcode = this->_op_table[instruction];
+	CPU::op_t opcode = this->_opTable[instruction];
 	if (opcode.opcode == nullptr) {
 		std::cerr << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << int(instruction) << std::endl;
 		this->_halted = 1;
@@ -428,7 +428,7 @@ void CPU::ASL(uint16_t address) {
 		std::cout << "ASL\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::ASL_ACC(uint16_t address [[maybe_unused]]) {
+void CPU::ASL_ACC([[maybe_unused]] uint16_t address) {
 	this->setFlagCarry(this->_registers.a & 0x80);
 	this->_registers.a <<= 1;
 	this->updateFlagZero(this->_registers.a);
@@ -465,19 +465,19 @@ void CPU::BNE(uint16_t address) {
 		std::cout << "BNE\t$" << address << std::endl;
 }
 
-void CPU::BRK(uint16_t address [[maybe_unused]]) {
+void CPU::BRK( [[maybe_unused]]uint16_t address) {
 	this->_halted = true;
 	if (this->_debug)
 		std::cout << "BRK" << std::endl;
 }
 
-void CPU::CLC(uint16_t address [[maybe_unused]]) {
+void CPU::CLC( [[maybe_unused]]uint16_t address) {
 	this->_registers.p &= ~CARRY;
 	if (this->_debug)
 		std::cout << "CLC" << std::endl;
 }
 
-void CPU::CLD(uint16_t address [[maybe_unused]]) {
+void CPU::CLD( [[maybe_unused]]uint16_t address) {
 	this->_registers.p &= ~DECIMAL;
 	if (this->_debug)
 		std::cout << "CLD" << std::endl;
@@ -510,7 +510,7 @@ void CPU::CPY(uint16_t address) {
 		std::cout << "CPY\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::DEX(uint16_t address [[maybe_unused]]) {
+void CPU::DEX( [[maybe_unused]]uint16_t address) {
 	this->_registers.x--;
 	this->updateFlagZero(this->_registers.x);
 	this->updateFlagNegative(this->_registers.x);
@@ -518,7 +518,7 @@ void CPU::DEX(uint16_t address [[maybe_unused]]) {
 		std::cout << "DEX" << std::endl;
 }
 
-void CPU::DEY(uint16_t address [[maybe_unused]]) {
+void CPU::DEY( [[maybe_unused]]uint16_t address) {
 	this->_registers.y--;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -526,7 +526,7 @@ void CPU::DEY(uint16_t address [[maybe_unused]]) {
 		std::cout << "DEY" << std::endl;
 }
 
-void CPU::INX(uint16_t address [[maybe_unused]]) {
+void CPU::INX( [[maybe_unused]]uint16_t address) {
 	this->_registers.x++;
 	this->updateFlagZero(this->_registers.x);
 	this->updateFlagNegative(this->_registers.x);
@@ -534,7 +534,7 @@ void CPU::INX(uint16_t address [[maybe_unused]]) {
 		std::cout << "INX" << std::endl;
 }
 
-void CPU::INY(uint16_t address [[maybe_unused]]) {
+void CPU::INY( [[maybe_unused]]uint16_t address) {
 	this->_registers.y++;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -594,7 +594,7 @@ void CPU::LSR(uint16_t address) {
 		std::cout << "LSR\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::LSR_ACC(uint16_t address [[maybe_unused]]) {
+void CPU::LSR_ACC( [[maybe_unused]]uint16_t address) {
 	this->setFlagCarry(this->_registers.a & 0x01);
 	this->_registers.a >>= 1;
 	this->updateFlagZero(this->_registers.a);
@@ -603,7 +603,7 @@ void CPU::LSR_ACC(uint16_t address [[maybe_unused]]) {
 		std::cout << "LSR\tA" << std::endl;
 }
 
-void CPU::NOP(uint16_t address [[maybe_unused]]) {
+void CPU::NOP( [[maybe_unused]]uint16_t address) {
 	this->toggleDebug();
 	if (this->_debug)
 		std::cout << "NOP" << std::endl;
@@ -618,19 +618,19 @@ void CPU::ORA(uint16_t address) {
 		std::cout << "ORA\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::PHA(uint16_t address [[maybe_unused]]) {
+void CPU::PHA( [[maybe_unused]]uint16_t address) {
 	this->writeToDevice(0xff + this->_registers.sp--, this->_registers.a);
 	if (this->_debug)
 		std::cout << "PHA" << std::endl;
 }
 
-void CPU::PHP(uint16_t address [[maybe_unused]]) {
+void CPU::PHP( [[maybe_unused]]uint16_t address) {
 	this->writeToDevice(0xff + this->_registers.sp--, this->_registers.p);
 	if (this->_debug)
 		std::cout << "PHP" << std::endl;
 }
 
-void CPU::PLA(uint16_t address [[maybe_unused]]) {
+void CPU::PLA( [[maybe_unused]]uint16_t address) {
 	this->_registers.a = this->readFromDevice(0xff + ++this->_registers.sp);
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
@@ -638,13 +638,13 @@ void CPU::PLA(uint16_t address [[maybe_unused]]) {
 		std::cout << "PLA" << std::endl;
 }
 
-void CPU::PLP(uint16_t address [[maybe_unused]]) {
+void CPU::PLP( [[maybe_unused]]uint16_t address) {
 	this->_registers.p = this->readFromDevice(0xff + ++this->_registers.sp);
 	if (this->_debug)
 		std::cout << "PLP" << std::endl;
 }
 
-void CPU::RTS(uint16_t address [[maybe_unused]]) {
+void CPU::RTS( [[maybe_unused]]uint16_t address) {
 	this->_registers.pc = this->readFromDevice(0xff + ++this->_registers.sp);
 	this->_registers.pc += this->readFromDevice(0xff + ++this->_registers.sp) << 8;
 	if (this->_debug)
@@ -663,7 +663,7 @@ void CPU::SBC(uint16_t address) {
 		std::cout << "SBC\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::SEC(uint16_t address [[maybe_unused]]) {
+void CPU::SEC( [[maybe_unused]]uint16_t address) {
 	this->_registers.p |= CARRY;
 	if (this->_debug)
 		std::cout << "SEC" << std::endl;
@@ -675,7 +675,7 @@ void CPU::STA(uint16_t address) {
 		std::cout << "STA\t$" << address << std::endl;
 }
 
-void CPU::TAY(uint16_t address [[maybe_unused]]) {
+void CPU::TAY( [[maybe_unused]]uint16_t address) {
 	this->_registers.y = this->_registers.a;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -683,13 +683,13 @@ void CPU::TAY(uint16_t address [[maybe_unused]]) {
 		std::cout << "TAY" << std::endl;
 }
 
-void CPU::TXS(uint16_t address [[maybe_unused]]) {
+void CPU::TXS( [[maybe_unused]]uint16_t address) {
 	this->_registers.sp = this->_registers.x;
 	if (this->_debug)
 		std::cout << "TXS" << std::endl;
 }
 
-void CPU::TYA(uint16_t address [[maybe_unused]]) {
+void CPU::TYA( [[maybe_unused]]uint16_t address) {
 	this->_registers.a = this->_registers.y;
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
@@ -734,36 +734,42 @@ void CPU::setFlagOverflow(bool active) {
 }
 
 uint8_t CPU::readFromDevice(uint16_t address) {
-	std::vector<Device*> devices = this->getDevices(address);
+	std::vector<Device*> devices = this->getDevices(address, 'R');
+	uint8_t data = 0;
 	if (devices.empty()) {
-		std::cerr << "WARNING: no device at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		std::cerr << "WARNING: no device with read access mode at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return rand() % 256;
 	}
 	if (devices.size() > 1) {
-		std::cerr << "WARNING: No RO managment, " << devices.size() << " devices at this address, except garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
-		return rand() % 256;
+		std::cerr << "WARNING: " << devices.size() << " devices with read access mode at this address, except mixed garbage data (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 	}
-	return devices[0]->readByte(address);
+	for (Device* device : devices) {
+		data |= device->readByte(address);
+	}
+	return data;
 }
 
 void CPU::writeToDevice(uint16_t address, uint8_t byte) {
-	std::vector<Device*> devices = this->getDevices(address);
+	std::vector<Device*> devices = this->getDevices(address, 'W');
 	if (devices.empty()) {
-		std::cerr << "WARNING: no device at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		std::cerr << "WARNING: no device with write access mode at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
 		return;
 	}
 	if (devices.size() > 1) {
-		std::cerr << "WARNING: No WO managment, " << devices.size() << " devices at this address, write to nothing (0x" << std::setfill('0') << std::setw(4) << std::hex << address << ")" << std::endl;
+		std::cerr << "WARNING: " << devices.size() << " devices with write access mode at this address" << std::endl;
 		return;
 	}
-	devices[0]->writeByte(address, byte);
+	for (Device* device : devices) {
+		device->writeByte(address, byte);
+	}
 }
 
-std::vector<Device*> CPU::getDevices(uint16_t address) const {
+std::vector<Device*> CPU::getDevices(uint16_t address, char accessMode = 0x00) const {
 	std::vector<Device*> devices;
 	for (Device* device: this->_devices) {
 		if (address >= device->getOffset() && address < device->getOffset() + device->getSize())
-			devices.push_back(device);
+			if (accessMode == 0x00 || device->getAccessMode().find(accessMode) != std::string::npos)
+				devices.push_back(device);
 	}
 	return devices;
 }
@@ -775,7 +781,7 @@ std::vector<Device*> CPU::getDevices() const {
 std::ostream& operator<<(std::ostream& os, const CPU& cpu) {
 	os << "Device mapping:" << std::endl;
 	for (Device* device: cpu.getDevices()) {
-		os << "    " << device->getName() << ":\t0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() << " - 0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() + device->getSize() - 1 << std::endl;
+		os << "    " << device->getName() << ":\t0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() << " - 0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() + device->getSize() - 1 << "\t(" << device->getAccessMode() << ")" << std::endl;
 	}
 	os << "Registers:" << std::endl;
 	os << "    a:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().a) << std::endl;

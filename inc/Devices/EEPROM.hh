@@ -7,7 +7,7 @@
 
 class EEPROM : public Device {
 public:
-	EEPROM(uint16_t bus_position, std::string file);
+	EEPROM(uint16_t busPosition, const std::string& file);
 	~EEPROM();
 
 	void writeByte(uint16_t index, uint8_t value);
