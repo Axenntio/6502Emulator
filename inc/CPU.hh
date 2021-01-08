@@ -78,8 +78,11 @@ private:
 	void CMP(uint16_t address);
 	void CPX(uint16_t address);
 	void CPY(uint16_t address);
+	void DEC(uint16_t address);
 	void DEX(uint16_t address);
 	void DEY(uint16_t address);
+	void EOR(uint16_t address);
+	void INC(uint16_t address);
 	void INX(uint16_t address);
 	void INY(uint16_t address);
 	void JMP(uint16_t address);
@@ -95,6 +98,7 @@ private:
 	void PHP(uint16_t address);
 	void PLA(uint16_t address);
 	void PLP(uint16_t address);
+	void ROL_ACC(uint16_t address);
 	void RTS(uint16_t address);
 	void SBC(uint16_t address);
 	void SEC(uint16_t address);

@@ -53,7 +53,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0x27] = {nullptr, nullptr, 1};
 	this->_opTable[0x28] = {&CPU::PLP, &CPU::impliedAddress, 4};
 	this->_opTable[0x29] = {&CPU::AND, &CPU::immediateAddress, 2};
-	this->_opTable[0x2a] = {nullptr, &CPU::accumulatorAddress, 1};
+	this->_opTable[0x2a] = {&CPU::ROL_ACC, &CPU::accumulatorAddress, 2};
 	this->_opTable[0x2b] = {nullptr, nullptr, 1};
 	this->_opTable[0x2c] = {nullptr, &CPU::absoluteAddress, 1};
 	this->_opTable[0x2d] = {&CPU::AND, &CPU::absoluteAddress, 4};
@@ -76,35 +76,35 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0x3e] = {nullptr, &CPU::absoluteXAddress, 1};
 	this->_opTable[0x3f] = {nullptr, nullptr, 1};
 	this->_opTable[0x40] = {nullptr, &CPU::impliedAddress, 1}; // 0x40
-	this->_opTable[0x41] = {nullptr, &CPU::indirectXAddress, 1};
+	this->_opTable[0x41] = {&CPU::EOR, &CPU::indirectXAddress, 6};
 	this->_opTable[0x42] = {nullptr, nullptr, 1};
 	this->_opTable[0x43] = {nullptr, nullptr, 1};
 	this->_opTable[0x44] = {nullptr, nullptr, 1};
-	this->_opTable[0x45] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0x45] = {&CPU::EOR, &CPU::zeropageAddress, 3};
 	this->_opTable[0x46] = {&CPU::LSR, &CPU::zeropageAddress, 5};
 	this->_opTable[0x47] = {nullptr, nullptr, 1};
 	this->_opTable[0x48] = {&CPU::PHA, &CPU::impliedAddress, 3};
-	this->_opTable[0x49] = {nullptr, &CPU::immediateAddress, 1};
+	this->_opTable[0x49] = {&CPU::EOR, &CPU::immediateAddress, 2};
 	this->_opTable[0x4a] = {&CPU::LSR_ACC, &CPU::accumulatorAddress, 2};
 	this->_opTable[0x4b] = {nullptr, nullptr, 1};
-	this->_opTable[0x4c] = {&CPU::JMP,   &CPU::absoluteAddress, 3};
-	this->_opTable[0x4d] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0x4c] = {&CPU::JMP, &CPU::absoluteAddress, 3};
+	this->_opTable[0x4d] = {&CPU::EOR, &CPU::absoluteAddress, 5};
 	this->_opTable[0x4e] = {&CPU::LSR, &CPU::absoluteAddress, 6};
 	this->_opTable[0x4f] = {nullptr, nullptr, 1};
 	this->_opTable[0x50] = {nullptr, &CPU::relativeAddress, 1}; // 0x50
-	this->_opTable[0x51] = {nullptr, &CPU::indirectYAddress, 1};
+	this->_opTable[0x51] = {&CPU::EOR, &CPU::indirectYAddress, 5};
 	this->_opTable[0x52] = {nullptr, nullptr, 1};
 	this->_opTable[0x53] = {nullptr, nullptr, 1};
 	this->_opTable[0x54] = {nullptr, nullptr, 1};
-	this->_opTable[0x55] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0x55] = {&CPU::EOR, &CPU::zeropageXAddress, 4};
 	this->_opTable[0x56] = {&CPU::LSR, &CPU::zeropageXAddress, 6};
 	this->_opTable[0x57] = {nullptr, nullptr, 1};
 	this->_opTable[0x58] = {nullptr, &CPU::impliedAddress, 1};
-	this->_opTable[0x59] = {nullptr, &CPU::absoluteYAddress, 1};
+	this->_opTable[0x59] = {&CPU::EOR, &CPU::absoluteYAddress, 4};
 	this->_opTable[0x5a] = {nullptr, nullptr, 1};
 	this->_opTable[0x5b] = {nullptr, nullptr, 1};
 	this->_opTable[0x5c] = {nullptr, nullptr, 1};
-	this->_opTable[0x5d] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0x5d] = {&CPU::EOR, &CPU::absoluteXAddress, 4};
 	this->_opTable[0x5e] = {&CPU::LSR, &CPU::absoluteXAddress, 7};
 	this->_opTable[0x5f] = {nullptr, nullptr, 1};
 	this->_opTable[0x60] = {&CPU::RTS, &CPU::impliedAddress, 6}; // 0x60
@@ -119,7 +119,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0x69] = {&CPU::ADC, &CPU::immediateAddress, 2};
 	this->_opTable[0x6a] = {nullptr, &CPU::accumulatorAddress, 1};
 	this->_opTable[0x6b] = {nullptr, nullptr, 1};
-	this->_opTable[0x6c] = {nullptr, &CPU::indirectAddress, 1};
+	this->_opTable[0x6c] = {&CPU::JMP, &CPU::indirectAddress, 5};
 	this->_opTable[0x6d] = {&CPU::ADC, &CPU::absoluteAddress, 4};
 	this->_opTable[0x6e] = {nullptr, &CPU::absoluteAddress, 1};
 	this->_opTable[0x6f] = {nullptr, nullptr, 1};
@@ -209,7 +209,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xc3] = {nullptr, nullptr, 1};
 	this->_opTable[0xc4] = {&CPU::CPY, &CPU::zeropageAddress, 3};
 	this->_opTable[0xc5] = {&CPU::CMP, &CPU::zeropageAddress, 3};
-	this->_opTable[0xc6] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0xc6] = {&CPU::DEC, &CPU::zeropageAddress, 5};
 	this->_opTable[0xc7] = {nullptr, nullptr, 1};
 	this->_opTable[0xc8] = {&CPU::INY, &CPU::impliedAddress, 2};
 	this->_opTable[0xc9] = {&CPU::CMP, &CPU::immediateAddress, 2};
@@ -217,7 +217,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xcb] = {nullptr, nullptr, 1};
 	this->_opTable[0xcc] = {&CPU::CPY, &CPU::absoluteAddress, 4};
 	this->_opTable[0xcd] = {&CPU::CMP, &CPU::absoluteAddress, 4};
-	this->_opTable[0xce] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0xce] = {&CPU::DEC, &CPU::absoluteAddress, 6};
 	this->_opTable[0xcf] = {nullptr, nullptr, 1};
 	this->_opTable[0xd0] = {&CPU::BNE, &CPU::relativeAddress, 2}; // 0xd0
 	this->_opTable[0xd1] = {&CPU::CMP, &CPU::indirectYAddress, 5};
@@ -225,7 +225,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xd3] = {nullptr, nullptr, 1};
 	this->_opTable[0xd4] = {nullptr, nullptr, 1};
 	this->_opTable[0xd5] = {&CPU::CMP, &CPU::zeropageXAddress, 4};
-	this->_opTable[0xd6] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0xd6] = {&CPU::DEC, &CPU::zeropageXAddress, 6};
 	this->_opTable[0xd7] = {nullptr, nullptr, 1};
 	this->_opTable[0xd8] = {&CPU::CLD, &CPU::impliedAddress, 2};
 	this->_opTable[0xd9] = {&CPU::CMP, &CPU::absoluteYAddress, 4};
@@ -233,7 +233,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xdb] = {nullptr, nullptr, 1};
 	this->_opTable[0xdc] = {nullptr, nullptr, 1};
 	this->_opTable[0xdd] = {&CPU::CMP, &CPU::absoluteXAddress, 4};
-	this->_opTable[0xde] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0xde] = {&CPU::DEC, &CPU::absoluteXAddress,7};
 	this->_opTable[0xdf] = {nullptr, nullptr, 1};
 	this->_opTable[0xe0] = {&CPU::CPX, &CPU::immediateAddress, 2}; // 0xe0
 	this->_opTable[0xe1] = {&CPU::SBC, &CPU::indirectXAddress, 6};
@@ -241,7 +241,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xe3] = {nullptr, nullptr, 1};
 	this->_opTable[0xe4] = {&CPU::CPX, &CPU::zeropageAddress, 3};
 	this->_opTable[0xe5] = {&CPU::SBC, &CPU::zeropageAddress, 3};
-	this->_opTable[0xe6] = {nullptr, &CPU::zeropageAddress, 1};
+	this->_opTable[0xe6] = {&CPU::INC, &CPU::zeropageAddress, 5};
 	this->_opTable[0xe7] = {nullptr, nullptr, 1};
 	this->_opTable[0xe8] = {&CPU::INX, &CPU::impliedAddress, 2};
 	this->_opTable[0xe9] = {&CPU::SBC, &CPU::immediateAddress, 2};
@@ -249,7 +249,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xeb] = {nullptr, nullptr, 1};
 	this->_opTable[0xec] = {&CPU::CPX, &CPU::absoluteAddress, 4};
 	this->_opTable[0xed] = {&CPU::SBC, &CPU::absoluteAddress, 4};
-	this->_opTable[0xee] = {nullptr, &CPU::absoluteAddress, 1};
+	this->_opTable[0xee] = {&CPU::INC, &CPU::absoluteAddress, 6};
 	this->_opTable[0xef] = {nullptr, nullptr, 1};
 	this->_opTable[0xf0] = {&CPU::BEQ, &CPU::relativeAddress, 2}; // 0xf0
 	this->_opTable[0xf1] = {&CPU::SBC, &CPU::indirectYAddress, 5};
@@ -257,7 +257,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xf3] = {nullptr, nullptr, 1};
 	this->_opTable[0xf4] = {nullptr, nullptr, 1};
 	this->_opTable[0xf5] = {&CPU::SBC, &CPU::zeropageXAddress, 4};
-	this->_opTable[0xf6] = {nullptr, &CPU::zeropageXAddress, 1};
+	this->_opTable[0xf6] = {&CPU::INC, &CPU::zeropageXAddress, 6};
 	this->_opTable[0xf7] = {nullptr, nullptr, 1};
 	this->_opTable[0xf8] = {nullptr, &CPU::impliedAddress, 1};
 	this->_opTable[0xf9] = {&CPU::SBC, &CPU::absoluteYAddress, 4};
@@ -265,7 +265,7 @@ CPU::CPU(bool debug) : _halted(false), _debug(debug), _wait(0) {
 	this->_opTable[0xfb] = {nullptr, nullptr, 1};
 	this->_opTable[0xfc] = {nullptr, nullptr, 1};
 	this->_opTable[0xfd] = {&CPU::SBC, &CPU::absoluteXAddress, 4};
-	this->_opTable[0xfe] = {nullptr, &CPU::absoluteXAddress, 1};
+	this->_opTable[0xfe] = {&CPU::INC, &CPU::absoluteXAddress, 7};
 }
 
 CPU::~CPU() {
@@ -325,7 +325,7 @@ void CPU::parseInstructiom(uint8_t instruction) {
 	this->_registers.pc++;
 	CPU::op_t opcode = this->_opTable[instruction];
 	if (opcode.opcode == nullptr) {
-		std::cerr << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << int(instruction) << std::endl;
+		std::cerr << "Unknown instruction 0x" << std::setfill('0') << std::setw(2) << std::hex << int(instruction) << std::endl;
 		this->_halted = 1;
 	}
 	else {
@@ -465,19 +465,19 @@ void CPU::BNE(uint16_t address) {
 		std::cout << "BNE\t$" << address << std::endl;
 }
 
-void CPU::BRK( [[maybe_unused]]uint16_t address) {
+void CPU::BRK([[maybe_unused]] uint16_t address) {
 	this->_halted = true;
 	if (this->_debug)
 		std::cout << "BRK" << std::endl;
 }
 
-void CPU::CLC( [[maybe_unused]]uint16_t address) {
+void CPU::CLC([[maybe_unused]] uint16_t address) {
 	this->_registers.p &= ~CARRY;
 	if (this->_debug)
 		std::cout << "CLC" << std::endl;
 }
 
-void CPU::CLD( [[maybe_unused]]uint16_t address) {
+void CPU::CLD([[maybe_unused]] uint16_t address) {
 	this->_registers.p &= ~DECIMAL;
 	if (this->_debug)
 		std::cout << "CLD" << std::endl;
@@ -510,7 +510,16 @@ void CPU::CPY(uint16_t address) {
 		std::cout << "CPY\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::DEX( [[maybe_unused]]uint16_t address) {
+void CPU::DEC([[maybe_unused]] uint16_t address) {
+	uint8_t byte = this->readFromDevice(address) - 1;
+	this->updateFlagZero(byte);
+	this->updateFlagNegative(byte);
+	this->writeToDevice(address, byte);
+	if (this->_debug)
+		std::cout << "DEC" << std::endl;
+}
+
+void CPU::DEX([[maybe_unused]] uint16_t address) {
 	this->_registers.x--;
 	this->updateFlagZero(this->_registers.x);
 	this->updateFlagNegative(this->_registers.x);
@@ -518,7 +527,7 @@ void CPU::DEX( [[maybe_unused]]uint16_t address) {
 		std::cout << "DEX" << std::endl;
 }
 
-void CPU::DEY( [[maybe_unused]]uint16_t address) {
+void CPU::DEY([[maybe_unused]] uint16_t address) {
 	this->_registers.y--;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -526,7 +535,16 @@ void CPU::DEY( [[maybe_unused]]uint16_t address) {
 		std::cout << "DEY" << std::endl;
 }
 
-void CPU::INX( [[maybe_unused]]uint16_t address) {
+void CPU::EOR(uint16_t address) {
+	uint8_t byte = this->readFromDevice(address);
+	this->_registers.a |= byte;
+	this->updateFlagZero(this->_registers.a);
+	this->updateFlagNegative(this->_registers.a);
+	if (this->_debug)
+		std::cout << "EOR\t$" << uint16_t(byte) << std::endl;
+}
+
+void CPU::INX([[maybe_unused]] uint16_t address) {
 	this->_registers.x++;
 	this->updateFlagZero(this->_registers.x);
 	this->updateFlagNegative(this->_registers.x);
@@ -534,7 +552,16 @@ void CPU::INX( [[maybe_unused]]uint16_t address) {
 		std::cout << "INX" << std::endl;
 }
 
-void CPU::INY( [[maybe_unused]]uint16_t address) {
+void CPU::INC([[maybe_unused]] uint16_t address) {
+	uint8_t byte = this->readFromDevice(address) + 1;
+	this->updateFlagZero(byte);
+	this->updateFlagNegative(byte);
+	this->writeToDevice(address, byte);
+	if (this->_debug)
+		std::cout << "INC" << std::endl;
+}
+
+void CPU::INY([[maybe_unused]] uint16_t address) {
 	this->_registers.y++;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -594,7 +621,7 @@ void CPU::LSR(uint16_t address) {
 		std::cout << "LSR\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::LSR_ACC( [[maybe_unused]]uint16_t address) {
+void CPU::LSR_ACC([[maybe_unused]] uint16_t address) {
 	this->setFlagCarry(this->_registers.a & 0x01);
 	this->_registers.a >>= 1;
 	this->updateFlagZero(this->_registers.a);
@@ -603,7 +630,7 @@ void CPU::LSR_ACC( [[maybe_unused]]uint16_t address) {
 		std::cout << "LSR\tA" << std::endl;
 }
 
-void CPU::NOP( [[maybe_unused]]uint16_t address) {
+void CPU::NOP([[maybe_unused]] uint16_t address) {
 	this->toggleDebug();
 	if (this->_debug)
 		std::cout << "NOP" << std::endl;
@@ -618,19 +645,19 @@ void CPU::ORA(uint16_t address) {
 		std::cout << "ORA\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::PHA( [[maybe_unused]]uint16_t address) {
+void CPU::PHA([[maybe_unused]] uint16_t address) {
 	this->writeToDevice(0xff + this->_registers.sp--, this->_registers.a);
 	if (this->_debug)
 		std::cout << "PHA" << std::endl;
 }
 
-void CPU::PHP( [[maybe_unused]]uint16_t address) {
+void CPU::PHP([[maybe_unused]] uint16_t address) {
 	this->writeToDevice(0xff + this->_registers.sp--, this->_registers.p);
 	if (this->_debug)
 		std::cout << "PHP" << std::endl;
 }
 
-void CPU::PLA( [[maybe_unused]]uint16_t address) {
+void CPU::PLA([[maybe_unused]] uint16_t address) {
 	this->_registers.a = this->readFromDevice(0xff + ++this->_registers.sp);
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
@@ -638,17 +665,28 @@ void CPU::PLA( [[maybe_unused]]uint16_t address) {
 		std::cout << "PLA" << std::endl;
 }
 
-void CPU::PLP( [[maybe_unused]]uint16_t address) {
+void CPU::PLP([[maybe_unused]] uint16_t address) {
 	this->_registers.p = this->readFromDevice(0xff + ++this->_registers.sp);
 	if (this->_debug)
 		std::cout << "PLP" << std::endl;
 }
 
-void CPU::RTS( [[maybe_unused]]uint16_t address) {
+void CPU::ROL_ACC([[maybe_unused]] uint16_t address) {
+	bool hasCarry = this->_registers.p & CARRY;
+	this->setFlagCarry(this->_registers.a & 0x80);
+	this->_registers.a <<= 1;
+	this->_registers.a |= 0x01 * (hasCarry == true);
+	this->updateFlagZero(this->_registers.a);
+	this->updateFlagNegative(this->_registers.a);
+	if (this->_debug)
+		std::cout << "ROL\tA" << std::endl;
+}
+
+void CPU::RTS([[maybe_unused]] uint16_t address) {
 	this->_registers.pc = this->readFromDevice(0xff + ++this->_registers.sp);
 	this->_registers.pc += this->readFromDevice(0xff + ++this->_registers.sp) << 8;
 	if (this->_debug)
-		std::cout << "RST" << std::endl;
+		std::cout << "RTS" << std::endl;
 }
 
 void CPU::SBC(uint16_t address) {
@@ -663,7 +701,7 @@ void CPU::SBC(uint16_t address) {
 		std::cout << "SBC\t$" << address << "\t#$" << uint16_t(byte) << std::endl;
 }
 
-void CPU::SEC( [[maybe_unused]]uint16_t address) {
+void CPU::SEC([[maybe_unused]] uint16_t address) {
 	this->_registers.p |= CARRY;
 	if (this->_debug)
 		std::cout << "SEC" << std::endl;
@@ -675,7 +713,7 @@ void CPU::STA(uint16_t address) {
 		std::cout << "STA\t$" << address << std::endl;
 }
 
-void CPU::TAY( [[maybe_unused]]uint16_t address) {
+void CPU::TAY([[maybe_unused]] uint16_t address) {
 	this->_registers.y = this->_registers.a;
 	this->updateFlagZero(this->_registers.y);
 	this->updateFlagNegative(this->_registers.y);
@@ -683,13 +721,13 @@ void CPU::TAY( [[maybe_unused]]uint16_t address) {
 		std::cout << "TAY" << std::endl;
 }
 
-void CPU::TXS( [[maybe_unused]]uint16_t address) {
+void CPU::TXS([[maybe_unused]] uint16_t address) {
 	this->_registers.sp = this->_registers.x;
 	if (this->_debug)
 		std::cout << "TXS" << std::endl;
 }
 
-void CPU::TYA( [[maybe_unused]]uint16_t address) {
+void CPU::TYA([[maybe_unused]] uint16_t address) {
 	this->_registers.a = this->_registers.y;
 	this->updateFlagZero(this->_registers.a);
 	this->updateFlagNegative(this->_registers.a);
