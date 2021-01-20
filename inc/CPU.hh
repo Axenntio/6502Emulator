@@ -108,10 +108,10 @@ private:
 	void PHP(uint16_t address);
 	void PLA(uint16_t address);
 	void PLP(uint16_t address);
-	// ROL
+	void ROL(uint16_t address);
 	void ROL_ACC(uint16_t address);
-	// ROR
-	// ROR_ACC
+	void ROR(uint16_t address);
+	void ROR_ACC(uint16_t address);
 	void RTS(uint16_t address);
 	void RTI(uint16_t address);
 	void SBC(uint16_t address);
