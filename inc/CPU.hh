@@ -4,14 +4,16 @@
 #ifndef __CPU_HH__
 #define __CPU_HH__
 
-#define NEGATIVE	128
-#define OVERFLOW	64
-#define IGNORED		32
-#define BREAK		16
-#define DECIMAL		8
-#define INTERRUPT	4
-#define ZERO		2
-#define CARRY		1 
+enum FlagType {
+	Carry = 1,
+	Zero = 2,
+	Interrupt = 4,
+	Decimal = 8,
+	Break = 16,
+	Ignored = 32,
+	Overflow = 64,
+	Negative = 128
+};
 
 typedef struct {
 	uint8_t a;
@@ -31,6 +33,7 @@ public:
 	void addDevice(Device* device);
 	registers_t getRegisters() const;
 	std::vector<Device*> getDevices() const;
+	Device* getDevice(const std::string& name) const;
 	void readResetVector();
 	bool sendCharToAcia(char c);
 	void cycle();
@@ -71,10 +74,17 @@ private:
 	void BCC(uint16_t address);
 	void BCS(uint16_t address);
 	void BEQ(uint16_t address);
+	void BIT(uint16_t address);
+	void BMI(uint16_t address);
 	void BNE(uint16_t address);
+	void BPL(uint16_t address);
 	void BRK(uint16_t address);
+	void BVC(uint16_t address);
+	void BVS(uint16_t address);
 	void CLC(uint16_t address);
 	void CLD(uint16_t address);
+	void CLI(uint16_t address);
+	void CLV(uint16_t address);
 	void CMP(uint16_t address);
 	void CPX(uint16_t address);
 	void CPY(uint16_t address);
@@ -98,12 +108,23 @@ private:
 	void PHP(uint16_t address);
 	void PLA(uint16_t address);
 	void PLP(uint16_t address);
+	// ROL
 	void ROL_ACC(uint16_t address);
+	// ROR
+	// ROR_ACC
 	void RTS(uint16_t address);
+	void RTI(uint16_t address);
 	void SBC(uint16_t address);
 	void SEC(uint16_t address);
+	void SED(uint16_t address);
+	void SEI(uint16_t address);
 	void STA(uint16_t address);
+	void STX(uint16_t address);
+	void STY(uint16_t address);
+	void TAX(uint16_t address);
 	void TAY(uint16_t address);
+	void TSX(uint16_t address);
+	void TXA(uint16_t address);
 	void TXS(uint16_t address);
 	void TYA(uint16_t address);
 
