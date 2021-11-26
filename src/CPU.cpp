@@ -287,6 +287,18 @@ bool CPU::isDebug() const {
 	return this->_debug;
 }
 
+
+void CPU::reset() {
+	this->_halted = false;
+	this->_wait = 0;
+	this->_registers.a = 0;
+	this->_registers.x = 0;
+	this->_registers.y = 0;
+	this->_registers.sp = 0xff;
+	this->_registers.p = 0;
+	this->readResetVector();
+}
+
 bool CPU::isHalted() const {
 	return this->_halted;
 }
@@ -973,12 +985,12 @@ std::ostream& operator<<(std::ostream& os, const CPU& cpu) {
 	for (Device* device: cpu.getDevices()) {
 		os << "    " << device->getName() << ":\t0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() << " - 0x" << std::setfill('0') << std::setw(4) << std::hex << device->getOffset() + device->getSize() - 1 << "\t(" << device->getAccessMode() << ")" << std::endl;
 	}
-	os << "Registers:" << std::endl;
-	os << "    a:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().a) << std::endl;
-	os << "    x:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().x) << std::endl;
-	os << "    y:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().y) << std::endl;
-	os << "    sp:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().sp) << std::endl;
-	os << "    p:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().p) << std::endl;
-	os << "    pc:\t0x" << std::setfill('0') << std::setw(4) << std::hex << int(cpu.getRegisters().pc) << std::endl;
+	// os << "Registers:" << std::endl;
+	// os << "    a:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().a) << std::endl;
+	// os << "    x:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().x) << std::endl;
+	// os << "    y:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().y) << std::endl;
+	// os << "    sp:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().sp) << std::endl;
+	// os << "    p:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(cpu.getRegisters().p) << std::endl;
+	// os << "    pc:\t0x" << std::setfill('0') << std::setw(4) << std::hex << int(cpu.getRegisters().pc) << std::endl;
 	return os;
 }

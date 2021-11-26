@@ -56,11 +56,15 @@ void signal_callback_handler(int signum) {
 	else if (signum == SIGTSTP) {
 		cpuPtr->toggleDebug();
 	}
+	else if (signum == SIGQUIT){
+		cpuPtr->reset();
+	}
 }
 
 int main(int argc, char **argv) {
 	signal(SIGINT, signal_callback_handler);
 	signal(SIGTSTP, signal_callback_handler);
+	signal(SIGQUIT, signal_callback_handler);
 	enable_raw_mode();
 	std::string file = "config.json";
 	if (argc == 2)
@@ -68,6 +72,7 @@ int main(int argc, char **argv) {
 	Config config(file);
 	CPU cpu = config.create_cpu();
 	cpuPtr = &cpu;
+	std::cout << cpu << std::endl;
 	while (!cpu.isHalted() && running) {
 		if (kbhit()) {
 			if (!cpu.sendCharToAcia(getch())) {
@@ -78,7 +83,6 @@ int main(int argc, char **argv) {
 		cpu.cycle();
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
-	std::cout << cpu << std::endl;
 	disable_raw_mode();
 	return 0;
 }

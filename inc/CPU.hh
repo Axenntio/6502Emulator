@@ -45,6 +45,7 @@ public:
 	void toggleDebug();
 	bool isDebug() const;
 
+	void reset();
 	bool isHalted() const;
 
 private:
