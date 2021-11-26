@@ -504,8 +504,16 @@ void CPU::BPL(uint16_t address) {
 
 void CPU::BRK([[maybe_unused]] uint16_t address) {
 	this->_halted = true;
-	if (this->_debug)
+	if (this->_debug) {
 		std::cout << "BRK" << std::endl;
+		std::cout << "Registers:" << std::endl;
+		std::cout << "    a:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(this->_registers.a) << std::endl;
+		std::cout << "    x:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(this->_registers.x) << std::endl;
+		std::cout << "    y:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(this->_registers.y) << std::endl;
+		std::cout << "    sp:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(this->_registers.sp) << std::endl;
+		std::cout << "    p:\t0x" << std::setfill('0') << std::setw(2) << std::hex << int(this->_registers.p) << std::endl;
+		std::cout << "    pc:\t0x" << std::setfill('0') << std::setw(4) << std::hex << int(this->_registers.pc) << std::endl;
+	}
 }
 
 void CPU::BVC(uint16_t address) {
