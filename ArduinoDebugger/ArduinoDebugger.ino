@@ -30,7 +30,7 @@ typedef struct {
 
 instruction_t instructions[] =
 {
-  {"BRK",  implied}, // 0x00
+  {"BRK", implied}, // 0x00
   {"ORA", indirect_x},
   {"---", none},
   {"---", none},
@@ -106,7 +106,7 @@ instruction_t instructions[] =
   {"EOR", immediate},
   {"LSR", accumulator},
   {"---", none},
-  {"JMP",   absolute},
+  {"JMP", absolute},
   {"EOR", absolute},
   {"LSR", absolute},
   {"---", none},
@@ -180,7 +180,7 @@ instruction_t instructions[] =
   {"---", none},
   {"STY", zeropage_x},
   {"STA", zeropage_x},
-  {"STX", zeropage_x},
+  {"STX", zeropage_y},
   {"---", none},
   {"TYA", implied},
   {"STA", absolute_y},
